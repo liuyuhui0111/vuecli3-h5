@@ -6,22 +6,8 @@
 
 <script>
 
-
 export default {
   name: 'app',
-  watch: {
-    isShowLoading() {
-      if (this.isShowLoading) {
-        this.$loading();
-      } else {
-        this.$loading().close();
-      }
-    },
-  },
-  mounted() {
-    // console.log(this.$route.meta.keepAlive);
-  },
-
 };
 </script>
 
@@ -29,7 +15,7 @@ export default {
 
 #app {
   width: 100%;
-  height: 100%;
   overflow-x: hidden;
+  line-height: 1;
 }
 </style>

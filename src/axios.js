@@ -18,13 +18,28 @@ let requestList = [];
 */
 axios.interceptors.request.use(
     (config) => {
+      if(!navigator.onLine && !store.getters.netWorkError){
+       // 网络中断  切不在提示状态的时候
+         store.commit('setNetWork',true);
+         clearTimeout(timer);
+         let timer = setTimeout(()=>{
+            store.commit('setNetWork',false);
+         },2000);
+         return;
+      }
         config.headers.Authorization = store.getters.token ? store.getters.token : '-1';
         config.headers.httpHost = window.location.host || '';
+        if(process.env.NODE_ENV === 'development'){
+          config.headers.httpHost = process.env.VUE_APP_HOST;
+        }
+        // config.headers.httpHost = "test.5ifapiao.com:8888";
+
         if(!config.isHideLoading){
           // 如果不为true 请求提示loadding
           requestList.push(config.url);
           if(!COMMON_LOADING){
-            COMMON_LOADING = Vue.prototype.$loading();
+            COMMON_LOADING = true;
+            store.commit('setLoading',true);
           }
         }
         // 添加headers "application/x-www-form-urlencoded"
@@ -61,25 +76,21 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
     (response) => {
             if(COMMON_LOADING){
-              
+
               requestList.forEach((item,index)=>{
                 if(item === response.config.url){
                   requestList.splice(index,1);
                 }
               })
               if(requestList.length<1){
-                COMMON_LOADING.close();
+                store.commit('setLoading',false);
                 COMMON_LOADING = null;
               }
-              
+
             }
             // console.log('token::::::::',store.getters.token,'code::::::::',response.data.code)
             if(response.data.code === '0002' && store.getters.token){
               // 登录过期
-              Vue.prototype.$message({
-                message: '登录状态过期，请重新登录',
-                type: 'warning'
-              });
               store.commit('setToken','');
             }
             return response;
@@ -93,7 +104,7 @@ axios.interceptors.response.use(
                 }
               })
               if(requestList.length<1){
-                COMMON_LOADING.close();
+                store.commit('setLoading',false);
                 COMMON_LOADING = null;
               }
             }
@@ -102,7 +113,7 @@ axios.interceptors.response.use(
         }else{
           return Promise.reject('请求出错，请稍后再试');
         }
-        
+
     },
 );
 /* eslint-enable */

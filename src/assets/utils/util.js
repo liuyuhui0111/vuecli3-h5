@@ -77,18 +77,18 @@ function replaceCode() {
   /*eslint-disable*/
     const reg = /code\=\w*(&|$)/;
     let href = window.location.href;
-    let host = href.split('#')[0];
+    // let host = href.split('#')[0];
 
-        // ie9  不支持history模式 hash模式
+    //     // ie9  不支持history模式 hash模式
 
-        let hashArr = window.location.hash.replace('#', '').split('?');
-        let path = encodeURIComponent(hashArr[0].substring(1, hashArr[0].length)); // path
-        // 把参数截取成数组[a=1,b=2]
-        // let queryList = hashArr[1]?hashArr[1].split('&'):[];
-        let query = hashArr[1] ? `&${hashArr[1]}` : '';
-        // 取消 #号  拼接成 ?path=path
+    //     let hashArr = window.location.hash.replace('#', '').split('?');
+    //     let path = encodeURIComponent(hashArr[0].substring(1, hashArr[0].length)); // path
+    //     // 把参数截取成数组[a=1,b=2]
+    //     // let queryList = hashArr[1]?hashArr[1].split('&'):[];
+    //     let query = hashArr[1] ? `&${hashArr[1]}` : '';
+    //     // 取消 #号  拼接成 ?path=path
 
-        href = host + `?${COMMON_REPLACE_URL}=${path}${query}`;
+    //     href = host + `?${COMMON_REPLACE_URL}=${path}${query}`;
 
         href=href.replace(reg, '');
         if (href.substr(href.length - 1, 1) === '?' || href.substr(href.length - 1, 1) === '&') {
@@ -162,6 +162,39 @@ function transferString(content) {
   return string;
 }
 
+function getNetworkType() {
+  // 获取网络状态,wifi net 流量
+  let ua = navigator.userAgent;
+  let networkStr = ua.match(/NetType\/\w+/) ? ua.match(/NetType\/\w+/)[0] : 'NetType/other';
+  networkStr = networkStr.toLowerCase().replace('nettype/', '');
+  let networkType;
+  console.log(ua);
+  console.log(networkStr);
+  switch (networkStr) {
+    case 'wifi':
+      networkType = 'wifi';
+      break;
+    case '5g':
+      networkType = 'net';
+      break;
+    case '4g':
+      networkType = 'net';
+      break;
+    case '3g':
+      networkType = 'net';
+      break;
+    case '3gnet':
+      networkType = 'net';
+      break;
+    case '2g':
+      networkType = 'net';
+      break;
+    default:
+      networkType = 'error';
+  }
+  return networkType;
+}
+
 export {
   COMMON_REPLACE_URL,
   setTokenFn,
@@ -175,4 +208,5 @@ export {
   getUrlParam,
   initList,
   transferString,
+  getNetworkType,
 };

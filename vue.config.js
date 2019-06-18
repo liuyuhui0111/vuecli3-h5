@@ -1,17 +1,15 @@
 let baseProxyUrl = '';
-let publicPath = process.env.NODE_ENV === 'development' ? '/' : '/course/'; // 生产环境发布路径
-/*eslint-disable*/
-// 线下课相关接口
-// let apiOffline = ['/offline', 'offlineUnLogin', '/orderUnLogin', '/orderInfo', '/orderId'];
-// // 个人中心相关
-// let apiCenter = ['personalorder-web', '/classpower-web', '/membercenter', '/myapplication-web', '/personal-web', '/myClass-web', '/mycollection-web', '/mycollection-web'];
-// // 线上课程相关
-// let apiOnline = ['/course-web', '/courseUnlogin-web', '/category-web', '/searchword-web', '/searchword-web', '/evaluate', '/review'];
-let proxyData = {
+let publicPath = process.env.NODE_ENV === 'development' ? '/' : process.env.VUE_APP_PATH; // 生产环境发布路径
 
-    'http://wxkf.5ifapiao.com': ['/course_authentication', '/course_api-gateway'],  //开发环境登录
-    // 'http://test.5ifapiao.com:8888': ['/fatscourse'],
-    // 'http://10.1.29.53:9983': ['/fatscourse'],
+/*eslint-disable*/
+baseProxyUrl = process.env.VUE_APP_URL;  //dev使用测试环境数据  需要连本地调试 屏蔽此行代码
+
+
+let proxyData = {
+    'http://test.5ifapiao.com:8888': [
+    // '/fatscourse',
+    '/ele-myinvoice','/course_authentication', '/course_api-gateway'
+    ],    //分享
     'http://10.1.28.167:9983': ['/fatscourse'],
 };
 
@@ -34,9 +32,6 @@ Object.keys(proxyData).forEach((key) => {
     });
 });
 
-console.log('publicPath=============',publicPath)
-console.log('VUE_APP_ENV=============',process.env.VUE_APP_ENV)
-console.log('NODE_ENV=============',process.env.NODE_ENV)
 
 module.exports = {
     // 基本路径

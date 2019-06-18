@@ -12,9 +12,14 @@ import {
   getUserInfo,
   goLogin,
   loginout,
+  wxShare,
 } from '@/api/apis';
 import { replaceCode, getUrlParam } from '@/assets/utils/util';
-import baseImg from '@/views/components/img.vue'
+import baseImg from '@/views/components/img.vue';
+import BackTop from '@/views/components/backtop.vue';
+import {
+  wxConfig,
+} from '@/assets/utils/wxFunction';
 
 export default {
   install(Vue) {
@@ -23,71 +28,118 @@ export default {
         return {
           // token: '',
           publicPath: process.env.BASE_URL,
-          isCanRequest: true,
+          wxShareTitle: '优税学院',
+          wxShareUrl: '', // 分享地址
+          wxShareImage: '', // 分享图片地址
+          wxShareDesc: '', // 分享描述
+          isCanRequest: true, // 防止重复请求
+          scrollInitHeight: 700,
         };
       },
       mounted() {
+        this.scrollInitHeight = window.innerHeight;
       },
       components: {
-        baseImg
+        BackTop,
+        baseImg,
       },
-      // watch:{
-      //   'token':function(val){
-      //     if(val){
-      //       this.getUserInfoFn();
-      //     }
-      //   }
-      // },
-
+      beforeRouteEnter(to, from, next) {
+        if (to.meta.isNeedLogin) {
+          // 是否需要登录
+          next((vm) => {
+            if (vm.name === 'common-layout') {
+              // layout 直接退出
+              return;
+            }
+            if (!vm.token && !getUrlParam('code')) {
+              vm.login();
+            } else if (!vm.token && getUrlParam('code')) {
+              // 获取token  下一周期 执行init
+              vm.getTokenByCode(vm.init);
+            }
+          });
+        } else {
+          next();
+        }
+      },
       computed: {
         ...mapGetters([
           // 映射 this.count 为 store.state.count
-          'isShowLoading', // 是否显示全局Loading
           'token', // 是否显示全局Loading
           'commonUserData', // 用户相关信息
-          'COMMON_COMP_DATA',
+          'COMMON_COMP_DATA', // 公司主体信息
+          'netWorkError',
+          'requestLoading',
         ]),
       },
       methods: {
+        // 警告提示  $全局标记
+        $message(mes) {
+          // toast 提示
+          this.$createToast({
+            time: 3000,
+            txt: mes,
+            type: 'warn',
+          }).show();
+        },
 
         login(type) {
           // 去登录
           goLogin(type);
         },
-
-        loginout() {
+        loginoutFn() {
           // 退出登录，清空cookie
-          if (this.token) {
-            this.setToken('');
-            window.localStorage.removeItem('REDIRECT_URI');
-            window.location.replace(replaceCode());
-            this.$nextTick(() => {
-              loginout();
-            });
+          this.$createDialog({
+            type: 'confirm',
+            title: '提示',
+            content: '确定退出登录吗？',
+            confirmBtn: {
+              text: '确定',
+            },
+            cancelBtn: {
+              text: '取消',
+            },
+            onConfirm: () => {
+              this.setToken('');
+              window.localStorage.removeItem('REDIRECT_URI');
+              window.location.replace(replaceCode());
+              this.$nextTick(() => {
+                loginout();
+              });
+            },
+            onCancel: () => {
+              console.log('取消');
+            },
+          }).show();
+        },
+        cardClick(item) {
+          // 点击跳转详情
+          /*eslint-disable*/
+          if(item.type == '2'){
+            this.routerGo('/openCoursesDetails',{cid:item.id});
+          }else if(item.type == '1'){
+            this.routerGo('/lineOfCoursesDetails',{cid:item.id});
           }
+          /* eslint-enable */
         },
-        confirm(message) {
-          let m = message || '您还没有登录，去登录?';
-          this.$confirm(m, '提示', {
-            confirmButtonText: '登录',
-            cancelButtonText: '取消',
-            customClass: 'common-conifrm-box',
-            confirmButtonClass: 'common-confirm-sub',
-            cancelButtonClass: 'common-confirm-cancel',
-            type: 'warning',
-          }).then(() => {
-            this.login();
-          }).catch(() => {
-            console.log('取消');
-          });
+        toast(mes) {
+          // toast 提示
+          this.$createToast({
+            type: 'txt',
+            time: 3000,
+            txt: mes,
+          }).show();
         },
-        getTokenByCode(fn) {
-          // return;
+        confirmLogin(message) {
+          this.login();
+          console.log(message);
+        },
+        async getTokenByCode(fn) {
           const code = getUrlParam('code');
-
+          console.log('获取token=======0000');
           if (code && !this.token) {
             // code 存在  通过code获取token
-            getToken({ code }).then((res) => {
+            await getToken({ code }).then((res) => {
               // 设置token
               /* eslint-disable */
                 if(res.data.code === 0){
@@ -96,20 +148,14 @@ export default {
                     this.getUserInfoFn()
                     typeof (fn) === 'function' && fn();
                 }else{
-                    this.$message({
-                        message: '登录失败,请重新登录',
-                        type: 'warning',
-                    });
+                    this.$message('登录失败，请重新登录');
                 }
-                            
+
                 /* eslint-enable */
             }).catch((err) => {
               console.log(err);
               // 获取token 失败  退出登录 提示重新登录
-              this.$message({
-                message: '登录失败,请重新登录',
-                type: 'warning',
-              });
+              this.$message('登录失败，请重新登录');
             });
           }
         },
@@ -123,31 +169,96 @@ export default {
                 let user = res.data.leaguerList;
                 if (!user || !user.userName) {
                   this.setToken('');
-                  this.$message({
-                    message: '获取个人信息失败，请重新登录',
-                    type: 'warning',
-                  });
+                  this.$message('获取个人信息失败，请重新登录');
                   return;
                 }
-                let userData = {
-                  userName: user.userName || '', // 用户名
-                  managerUserId: user.managerUserId, // 管理员id
-                  userId: user.userId, // 用户id
-                  leaguerLevelId: user.leaguerLevelId, // 会员等级
-                  source: user.source, // 渠道
-                  leaguerLevelName: user.leaguerLevelName || '用户', // 会员等级名称
-                };
-                this.setUsers(userData);
+                this.setUsers(user);
               }
             }).catch((err) => {
               console.log(err);
             });
           }
         },
+        routerGoBlank(path, q) {
+          // 在新标签页打开
+          let query = q || {};
+          let routeUrl = this.$router.resolve(
+            { path, query },
+          );
+          window.open(routeUrl.href, '_blank');
+        },
+        routerReplace(path, q) {
+          // 路由跳转替换当前路由
+          let query = q || {};
+          this.$router.replace({ path, query });
+        },
+        routerGo(path, q) {
+          // 路由跳转
+          let query = q || {};
+          this.$router.push({ path, query });
+        },
+        emit(eventname, data) {
+          // 派发事件
+          this.$emit(eventname, data);
+        },
+
+
+        wxShareFn() {
+          // 设置分享标题 图片 描述 地址
+
+          wxShare().then((res) => {
+            if (res.data && res.data.appId) {
+              wxConfig(res.data);
+              /*eslint-disable*/ 
+          window.wx && window.wx.ready(() => {
+            this.wxShareSucFn();
+          });
+          /* eslint-enable */
+            }
+          }).catch((err) => {
+            console.log(err);
+          });
+        },
+        wxShareSucFn() {
+          /*eslint-disable*/ 
+      // 授权成功
+      //设置分享页
+      alert('wxShareTitle:::'+this.wxShareTitle+'===wxShareDesc:::'+this.wxShareDesc+'===wxShareUrl:::'+this.wxShareUrl+'===wxShareImage:::'+this.wxShareImage);
+      wx.onMenuShareTimeline({
+        title: this.wxShareTitle, // 分享标题
+        link: this.wxShareUrl, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+        imgUrl:this.wxShareImage, // 分享图标
+        success: function (res) {
+          // 用户确认分享后执行的回调函数
+          this.$message('分享成功');
+        },
+        cancel: function (res) {
+          // 用户取消分享后执行的回调函数
+        }
+      });
+      //分享给朋友
+      wx.onMenuShareAppMessage({
+        title: this.wxShareTitle, // 分享标题
+        link: this.wxShareUrl, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+        imgUrl: this.wxShareImage, // 分享图标
+        desc: this.wxShareDesc, // 分享描述
+        success: function (res) {
+          // 用户确认分享后执行的回调函数
+          this.$message('分享成功');
+        },
+        cancel: function (res) {
+          // 用户取消分享后执行的回调函数
+        }
+      });
+
+       /* eslint-enable */
+        },
 
         ...mapMutations([
           'setToken',
           'setCopData',
+          'setNetWork',
+          'setLoading',
         ]),
         ...mapMutations('user', [
           'setUsers',

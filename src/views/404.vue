@@ -3,7 +3,7 @@
         <img src="./imgs/404.png" alt="404">
         <p>sorry！你访问的页面被外星人带走了~</p>
         <div class="btns">
-            <span @click="routerGo(-1)">返回</span>
+            <span @click="routerReplace('/index')">返回首页</span>
         </div>
     </div>
 </template>

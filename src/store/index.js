@@ -9,20 +9,22 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 	state: {
-		isShowLoading: false,		//全局loading
-		keepAliveComponetScrolls: {},		//keepAlive 组件记录滚动条 path:scrolly
+		netWorkError:false,			//网络连接失败提示
+		requestLoading:false,			//请求LOADING
 		token:getTokenFn() ? getTokenFn() : '',		//token
-		COMMON_COMP_DATA:{
-		},
+		COMMON_COMP_DATA:{},
 	},
 	getters: {},
 	actions: {},
 	mutations: {
-		setShowLoading(state, { isShowLoading }) {
-	    state.isShowLoading = isShowLoading;
-	  },
 	  setCopData(state,data){
 	  	state.COMMON_COMP_DATA = JSON.parse(JSON.stringify(data));
+	  },
+	  setNetWork(state,flag){
+	  	state.netWorkError = flag;
+	  },
+	  setLoading(state,flag){
+	  	state.requestLoading = flag;
 	  },
 	  setToken(state,token) {
 	  	// 设置token  同步到cookie 有效期默认7天
@@ -30,12 +32,6 @@ export default new Vuex.Store({
 	  	setTokenFn(token);
 	    state.token = token;
 	  },
-    setKeepAliveComponetScrolls(state, { path , scroll }) {
-    	if(!path || !scrollY){
-    		return false;
-    	}
-        state.keepAliveComponetScrolls[path] = scrollY;
-    },
 	},
     modules: {
         user,

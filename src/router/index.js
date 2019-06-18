@@ -5,7 +5,10 @@ import Router from 'vue-router'
 import store from '@/store'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import {COMMON_REPLACE_URL} from '@/assets/utils/util'
+import childRoutes from '@/router/routes'
+import {
+  goLogin,
+} from '@/api/apis';
 
 Vue.use(Router);
 
@@ -19,9 +22,19 @@ NProgress.configure({
 })
 
 const routeConfs = [
-  { title:'404', name:'404', path:'*', view: () => import('@/views/404.vue') },
+  {
+    title: '404', name: '404', path: '*', view: () => import('@/views/404.vue'),
+  },
+  {
+    title: '优税学院', name: 'default', path: '/', redirect: '/index',
+  },
+  {
+    title: '优税学院', name: 'layout', path: '/layout', 
+    view: () => import('@/views/layout.vue'),
+    children:childRoutes
+  },
+  
 ];
-
 
 function initRoutes(routers){
   let arr = [];
@@ -47,13 +60,13 @@ let routes = initRoutes(routeConfs);
 
 let router = new Router({
   mode: 'history',
+  base:process.env.NODE_ENV === 'development' ? '/' : process.env.VUE_APP_PATH,
   routes: routes
 });
-
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || '加载中...'
   NProgress.start();
-  next()
+  next();
 })
 
 router.afterEach((to, from) => {

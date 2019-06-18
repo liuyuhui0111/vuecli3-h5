@@ -25,13 +25,23 @@ export function goLogin(type) {
     // 注册
     url = `/oauth/authorize?page=register&client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}`;
   }
-  window.location.href = SSO_URL + url;
+  window.location.replace(SSO_URL + url);
 }
 
 export function noPassLogin(params) {
   // 查询订单详情
   const url = `${BASE_URL}/unlogin/noPassLogin`;
   return post(url, params || {});
+}
+
+export function wxShare() {
+  // 微信授权
+  const url = '/ele-myinvoice/wx/getJSSDK';
+  let params = {
+    url: window.location.href,
+  };
+  return get(url, params, { isHideLoading: true });
+  // http://test.5ifapiao.com:8888/ele-myinvoice/wx/getJSSDK?url=http://news.cctv.com/2019/06/09/ARTIQblHBciy0xhvswBFzANn190609.shtml
 }
 
 export function loginout() {
@@ -76,13 +86,13 @@ export function getToken(params) {
     client_secret: CLIENT_ID,
   };
 
-  return post(url, formData);
+  return post(url, formData, { isHideLoading: true });
 }
 
 export function getUserInfo(params) {
   // 获取用户信息
   const url = `${BASE_URL}/personal-web/queryPersonal`;
-  return post(url, params || {});
+  return post(url, params || {}, { isHideLoading: true });
 }
 
 export function showFoucusPic(params) {
@@ -141,10 +151,11 @@ export function getHighTitleList(params) {
   const url = `${BASE_URL}/searchword-web/getHighTitleList`;
   return post(url, params || {});
 }
-export function getCourseList(params) {
+export function getCourseList(params, opt) {
   // boolean == 1 那么查询最热  否则查询最新~~~~ 视频课程列表
   const url = `${BASE_URL}/courseUnlogin-web/getCourseList`;
-  return post(url, params || {});
+  let options = opt || {};
+  return post(url, params || {}, options);
 }
 
 
@@ -153,10 +164,11 @@ export function findOfflineCourseById(params) {
   const url = `${BASE_URL}/offlineUnLogin/findOfflineCourseById`;
   return post(url, params || {});
 }
-export function offlineCourseList(params) {
+export function offlineCourseList(params, opt) {
   // 获取公开课列表
+  let options = opt || {};
   const url = `${BASE_URL}/offlineUnLogin/offlineCourseList`;
-  return post(url, params || {});
+  return post(url, params || {}, options);
 }
 
 

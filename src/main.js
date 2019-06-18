@@ -28,15 +28,10 @@ Vue.use(VueLazyload, {
     attempt: 1,
 });
 
-
-// if (process.env.NODE_ENV === 'development') {
-// require('./mock/mock.js');
-// }
 /* eslint-enable */
 Vue.use(mixin);
 
 Vue.config.productionTip = false;
-// alert(JSON.stringify(router))
 window.vue = new Vue({
   router,
   store,

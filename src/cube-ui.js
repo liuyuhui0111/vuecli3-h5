@@ -8,7 +8,7 @@ import {
   Style,
   // basic=========基础
   // Button,
-  // Loading,
+  Loading,
   // Tip,
   // Toolbar,
   // TabBar,
@@ -35,12 +35,13 @@ import {
   // DatePicker,
   // TimePicker,
   // SegmentPicker,
-  // Dialog,
+  Dialog,
   // ActionSheet,
   // Drawer,
   // ImagePreview,
   // scroll==============滚动
-  // Scroll,
+  Scroll,
+  // RecycleList,
   // Slide,
   // IndexList,
   // Swipe,
@@ -49,9 +50,10 @@ import {
   // ScrollNavBar,
 } from 'cube-ui';
 
+// Vue.use(RecycleList);
 Vue.use(Toast);
 // Vue.use(Button);
-// Vue.use(Loading);
+Vue.use(Loading);
 // Vue.use(Tip);
 // Vue.use(Toolbar);
 // Vue.use(TabBar);
@@ -76,11 +78,11 @@ Vue.use(Toast);
 // Vue.use(DatePicker);
 // Vue.use(TimePicker);
 // Vue.use(SegmentPicker);
-// Vue.use(Dialog);
+Vue.use(Dialog);
 // Vue.use(ActionSheet);
 // Vue.use(Drawer);
 // Vue.use(ImagePreview);
-// Vue.use(Scroll);
+Vue.use(Scroll);
 // Vue.use(Slide);
 // Vue.use(IndexList);
 // Vue.use(Swipe);

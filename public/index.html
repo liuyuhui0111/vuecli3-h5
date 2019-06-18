@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title id="<%= BASE_URL %>">优税学院</title>
+    <script src="//res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
   </head>
   <body>
     <noscript>
@@ -18,11 +19,5 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
-    <script>
-    if(navigator.appName == "Microsoft Internet Explorer"&&parseInt(navigator.appVersion.split(";")[1].replace(/[ ]/g, "").replace("MSIE",""))<9){
-        var path = document.getElementsByTagName('title')[0].id;
-        window.location.href = '..'+path+'update.html';
-    }
-    </script>
   </body>
 </html>
