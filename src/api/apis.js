@@ -5,6 +5,7 @@ import {
 import COMMON_ENV from '@/config/env';
 import {
   replaceCode,
+  getSystem,
 } from '@/assets/utils/util';
 // 登录 token 相关 18911413287 a123456
 const { SSO_URL } = COMMON_ENV;
@@ -25,7 +26,7 @@ export function goLogin(type) {
     // 注册
     url = `/oauth/authorize?page=register&client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}`;
   }
-  window.location.replace(SSO_URL + url);
+  window.location.href = SSO_URL + url;
 }
 
 export function noPassLogin(params) {
@@ -35,12 +36,26 @@ export function noPassLogin(params) {
 }
 
 export function wxShare() {
+  // params.url = encodeURIComponent(params.url);
   // 微信授权
+
   const url = '/ele-myinvoice/wx/getJSSDK';
   let params = {
-    url: window.location.href,
+    url: window.location.href.split('#')[0],
   };
+  if (getSystem().ios) {
+    // 如果是ios
+    /*eslint-disable*/ 
+    if (!window.enterUrl) {
+      window.enterUrl = window.location.href.split('#')[0];
+    }
+    // params.url = window.enterUrl;
+  }
+   /* eslint-enable */
+
+
   return get(url, params, { isHideLoading: true });
+
   // http://test.5ifapiao.com:8888/ele-myinvoice/wx/getJSSDK?url=http://news.cctv.com/2019/06/09/ARTIQblHBciy0xhvswBFzANn190609.shtml
 }
 
@@ -49,7 +64,7 @@ export function loginout() {
   const REDIRECT_URI = encodeURIComponent(replaceCode());
   window.localStorage.setItem('REDIRECT_URI', replaceCode());
   const url = `/course_authentication/h5/logout?redirect_uri=${REDIRECT_URI}`;
-  window.location.href = SSO_URL + url;
+  window.location.replace(SSO_URL + url);
 }
 
 export function locations(params) {
@@ -262,9 +277,9 @@ export function saveMyCollection(params) {
   const url = `${BASE_URL}/mycollection-web/saveMyCollection`;
   return post(url, params || {}, { isHideLoading: true });
 }
-export function queryMycollectionList(params) {
+export function queryCollectionClass(params) {
   // 查询收藏列表
-  const url = `${BASE_URL}/mycollection-web/queryMycollectionList`;
+  const url = `${BASE_URL}/mycollection-web/queryCollectionClass`;
   return post(url, params || {});
 }
 

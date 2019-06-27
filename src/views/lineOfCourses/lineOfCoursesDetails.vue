@@ -1,155 +1,202 @@
 <template>
     <div class="vipInfo_outer">
-        <!--banner start-->
-        <div class="banner_outer">
-            <!--开通会员 弹框-->
-            <div v-show="isShowDialogToBuy" class="block_outer">
-                <div class="tip">
-                    <span class="bigtext">开通会员或购买才可继续学习</span>
-                    <span>还有{{ lengthNum }}个章节未学习</span>
+        <div v-if="!courseOut" class="coutent">
+            <!--banner start-->
+            <div class="banner_outer">
+                <!--开通会员 弹框-->
+                <div v-show="isShowDialogToBuy" class="block_outer">
+                    <div class="tip">
+                        <span class="bigtext">开通会员或购买才可继续学习</span>
+                        <span>还有{{ lengthNum }}个章节未学习</span>
+                    </div>
+                    <div class="btns">
+                        <span @click="isShowDialogToBuy = false" class="cancel">取消</span>
+                        <span @click="goVip" class="confirm">开通会员免费学</span>
+                    </div>
                 </div>
-                <div class="btns">
-                    <span @click="isShowDialogToBuy = false" class="cancel">取消</span>
-                    <span @click="goVip" class="confirm">开通会员免费学</span>
+                <!--消耗权益 弹框-->
+                <div v-show="isShowDialogToIn" class="block_outer">
+                    <div class="tip">
+                        <span class="bigtext">权益消耗提醒</span>
+                        <span>观看本课会消耗您1次线上课程观看权益。</span>
+                        <span>当前剩余: {{ consumeNum }}次</span>
+                    </div>
+                    <div class="btns">
+                        <span @click="isShowDialogToIn = false" class="cancel">取消</span>
+                        <span @click="continueShow" class="confirm">继续观看</span>
+                    </div>
                 </div>
+                <!--购买课程 弹框-->
+                <div v-show="consumeShow" class="block_outer">
+                    <div class="tip">
+                        <!--<span class="bigtext">权益消耗提醒</span>-->
+                        <span class="bigtext">您购买的观看权益已消耗完,请去web端</span>
+                        <span class="bigtext">购买课程或续费。</span>
+                    </div>
+                    <div class="btns">
+                        <span @click="consumeShow = false" class="confirm">知道了</span>
+                    </div>
+                </div>
+                <!-- 没有权限 弹框 -->
+                <div v-show="goWebBuyShow" class="block_outer">
+                    <div class="tip">
+                        <!--<span class="bigtext">权益消耗提醒</span>-->
+                        <span class="bigtext">
+                            您已购买的{{ leaguerLevelName }}会员没有该课程的观看权限
+                        </span>
+                        <span class="bigtext">请去web端购买课程。</span>
+                    </div>
+                    <div class="btns">
+                        <span @click="goWebBuyShow = false" class="confirm">知道了</span>
+                    </div>
+                </div>
+                <!--continueOnShow-->
+                <div v-show="continueOnShow" class="block_outer">
+                    <div class="tip">
+                        <!--<span class="bigtext">权益消耗提醒</span>-->
+                        <span class="bigtext">流量消耗提醒</span>
+                        <span>您正在使用移动网络观看将产生流量费用。</span>
+                    </div>
+                    <div class="btns">
+                        <span @click="continueOnShow = false" class="cancel">取消</span>
+                        <span @click="continueOnFn" class="confirm">继续观看</span>
+                    </div>
+                </div>
+                <!--播放器-->
+                <div v-show="isShowIframe && !isShowIframeImg" class="iframe-box">
+                    <iframe
+                            id="playBox"
+                            allowfullscreen
+                            :width="iframe.width"
+                            :height="iframe.height"
+                            :src="curUrl"
+                            frameborder="0"
+                            scrolling='no'
+                    ></iframe>
+                </div>
+                <img
+                        v-show="!isShowIframe || isShowIframeImg"
+                        @click="play()"
+                        :src="detail.bannerUrl"
+                        alt=""
+                >
             </div>
-            <!--消耗权益 弹框-->
-            <div v-show="isShowDialogToIn" class="block_outer">
-                <div class="tip">
-                    <span class="bigtext">权益消耗提醒</span>
-                    <span>观看本课会消耗您1次线上课程观看权益。</span>
-                    <span>当前剩余: {{ consumeNum }}次</span>
-                </div>
-                <div class="btns">
-                    <span @click="isShowDialogToIn = false" class="cancel">取消</span>
-                    <span @click="continueShow" class="confirm">继续观看</span>
-                </div>
-            </div>
-            <!--购买课程 弹框-->
-            <div v-show="goWebBuyShow" class="block_outer">
-                <div class="tip">
-                    <!--<span class="bigtext">权益消耗提醒</span>-->
-                    <span class="bigtext">您购买的观看权益已消耗完,请去web端</span>
-                    <span class="bigtext">购买课程或续费。</span>
-                </div>
-                <div class="btns">
-                    <span @click="goWebBuyShow = false" class="confirm">知道了</span>
-                </div>
-            </div>
-            <!--continueOnShow-->
-            <div v-show="continueOnShow" class="block_outer">
-                <div class="tip">
-                    <!--<span class="bigtext">权益消耗提醒</span>-->
-                    <span class="bigtext">流量消耗提醒</span>
-                    <span>您正在使用移动网络观看将产生流量费用。</span>
-                </div>
-                <div class="btns">
-                    <span @click="continueOnShow = false" class="cancel">取消</span>
-                    <span @click="continueOnFn" class="confirm">继续观看</span>
-                </div>
-            </div>
-            <!--播放器-->
-            <div v-show="isShowIframe && !isShowIframeImg" class="iframe-box">
-                <iframe
-                        id="playBox"
-                        allowfullscreen
-                        :width="iframe.width"
-                        :height="iframe.height"
-                        :src="curUrl"
-                        frameborder="0"
-                        scrolling='no'
-                ></iframe>
-            </div>
-            <img
-                    v-show="!isShowIframe || isShowIframeImg"
-                    @click="play()"
-                    :src="detail.bannerUrl"
-                    alt=""
-            >
-        </div>
-        <!--banner end-->
-        <!--title start-->
-        <div class="title_outer">
-            <div class="tit-left">
-                <span>{{ detail.title }}</span>
-                <div class="tit-b">
-                    <span v-if="detail.payType != 0" class="red">￥{{ detail.price }}</span>
-                    <span v-else class="green">免费</span>
-                    <span>
+            <!--banner end-->
+            <!--title start-->
+            <div class="title_outer">
+                <div class="tit-left">
+                    <span class="title">{{ detail.title }}</span>
+                    <div class="tit-b">
+                        <span v-if="detail.payType != 0" class="red">￥{{ detail.price }}</span>
+                        <span v-else class="green">免费</span>
+                        <span
+                                v-show="detail.payType !== '0' && detail.text !== ''"
+                                class="orange">会员免费观看
+                            <small @click="showTip()">
+                                ?
+                               <div v-show="tipShow" class="tip_outer">
+                                        {{ detail.text }}
+                                    </div>
+                            </small>
+                        </span>
+                        <span>
                         {{ getTime(detail.courseVideoEntity) }} {{ detail.learnNum || 0 }}人已学
                     </span>
-                </div>
-
-            </div>
-            <div class="tit-right">
-                <div class="collect_box" @click="collectFn">
-                    <i v-if="!isColl" class="icon-dark"></i>
-                    <i v-else class="icon-bright"></i>
-                    <span v-if="!isColl">收藏</span>
-                    <!--bright-->
-                    <span v-else style="color:#FB683C;">已收藏</span>
-                </div>
-            </div>
-        </div>
-        <!--title end-->
-        <div class="link"></div>
-        <!-- nav start -->
-        <div class="nav_outer">
-            <ul>
-                <li
-                        @click="tavsClick(index)"
-                        v-for="(v,index) in vipTypeList"
-                        :key="index"
-                        :class="{active:tabsActive==index}"
-                >
-                    <span>{{ v }}</span>
-                    <div class="dbb-link"></div>
-                </li>
-            </ul>
-        </div>
-        <!-- nav end -->
-
-        <!-- 课程信息 start -->
-        <course-info :detailData="detail" v-show="tabShow == 0" ref="child"></course-info>
-        <!-- 课程信息 end -->
-        <!--章节 start-->
-        <div v-show="tabShow == 1" class="section_outer">
-            <ul>
-                <li
-                        :class="{active:curIndex === index}"
-                        :key="index" @click="changeVideo(v,index)"
-                        v-for="(v,index) in detail.courseVideoEntity">
-                    <div class="item-left">
-                        <i
-                                v-show="curIndex !== index"
-                                :class="v.icon">
-
-                        </i>
-                        <i
-                                v-show="curIndex === index && !isShowIframe && isShowIframeImg"
-                                class="icon-bofang1">
-
-                        </i>
-                        <i
-                                v-show="curIndex === index && isShowIframe && !isShowIframeImg"
-                                class="icon-zanting">
-
-                        </i>
                     </div>
-                    <div class="item-right">
-                        <span>{{ v.name }}</span>
-                        <span class="time">{{ getMinite(v.videoMinute) }}</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <!--章节 end-->
 
-        <!--footer start-->
-        <div class="footer_outer">
-            <span @click="goVip">开通会员免费学</span>
+                </div>
+                <div class="tit-right">
+                    <div class="collect_box" @click="collectFn">
+                        <i v-if="!isColl" class="icon-dark"></i>
+                        <i v-else class="icon-bright"></i>
+                        <span v-if="!isColl">收藏</span>
+                        <!--bright-->
+                        <span v-else style="color:#FB683C;">已收藏</span>
+                    </div>
+                </div>
+            </div>
+            <!--title end-->
+            <div class="link"></div>
+            <!-- nav start -->
+            <div class="nav_outer">
+                <ul>
+                    <li
+                            @click="tavsClick(index)"
+                            v-for="(v,index) in vipTypeList"
+                            :key="index"
+                            :class="{active:tabsActive==index}"
+                    >
+                        <span>{{ v }}</span>
+                        <div class="dbb-link"></div>
+                    </li>
+                </ul>
+            </div>
+            <!-- nav end -->
+
+            <!-- 课程信息 start -->
+            <course-info :detailData="detail" v-show="tabShow == 0" ref="child"></course-info>
+            <!-- 课程信息 end -->
+            <!--章节 start-->
+            <div v-show="tabShow == 1" class="section_outer">
+                <ul>
+                    <li
+                            :class="{active:curIndex === index}"
+                            :key="index" @click="changeVideo(v,index)"
+                            v-for="(v,index) in detail.courseVideoEntity">
+                        <div class="item-left">
+                            <i
+                                    v-show="curIndex !== index"
+                                    :class="v.icon">
+                            </i>
+                            <i
+                                    v-show="curIndex === index && !isShowIframe && isShowIframeImg"
+                                    :class="{
+                                        'icon-suoding1':(
+                                            footerBtnShow
+                                            &&
+                                            v.isTry == 0
+                                            &&
+                                            token
+                                            &&
+                                            detail.payType !== '0'
+                                            ),
+                                        'icon-bofang1': (
+                                            v.isTry == 1
+                                            ||
+                                            !token
+                                            ||
+                                            !footerBtnShow
+                                            ||
+                                            detail.payType == '0'
+                                         )
+                                     }">
+                            </i>
+                            <i
+                                    v-show="curIndex === index && isShowIframe && !isShowIframeImg"
+                                    class="icon-zanting">
+                            </i>
+                        </div>
+                        <div class="item-right">
+                            <span>{{ v.name }}</span>
+                            <span class="time">{{ getMinite(v.videoMinute) }}</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!--章节 end-->
+
+            <!--footer start-->
+            <div v-show="footerBtnShow && detail.payType !== '0'" class="footer_outer">
+                <span @click="goVip">开通会员免费学</span>
+            </div>
+            <!--footer end-->
         </div>
-        <!--footer end-->
+        <div v-else class="err_outer">
+            <i class="icon-out"></i>
+            <span>您查看的课程已下架,</span>
+            <span>您可以返回上页浏览其它页面</span>
+            <span @click="routerBack" class="back-btn">返回首页</span>
+        </div>
     </div>
 </template>
 <script>
@@ -157,7 +204,7 @@
 
 import courseInfo from '@/views/components/courseInfo.vue';
 
-import { getNetworkType } from '@/assets/utils/util.js';
+// import { getNetworkType } from '@/assets/utils/util.js';
 // insertEvaluate,getGoodEvaluateCount, getEvaluateList,
 
 import {
@@ -173,6 +220,7 @@ export default {
   name: 'vipInfo',
   data() {
     return {
+      leaguerLevelName: '', // 当前用户会员类型
       blockShow: false,
       tabShow: 0,
       vipTypeList: ['详情', '章节'], // nav  tabs
@@ -206,9 +254,13 @@ export default {
       isShowDialogTomes: false, // 是否显示评价弹窗
       isShowDialogToIn: false, // 消耗权益弹窗
       goWebBuyShow: false, // 去购买
+      consumeShow: false,
 
       continueOn: false, // 未使用wifi 是否播放
       continueOnShow: false, // 流量播放弹框
+      courseOut: false,
+      footerBtnShow: true, // 底部按钮
+      tipShow: false, // tip提示
     };
   },
   computed: {
@@ -232,6 +284,9 @@ export default {
     courseInfo,
   },
   mounted() {
+    if (this.commonUserData) {
+      this.leaguerLevelName = this.commonUserData.leaguerLevelName;
+    }
     this.init();
   },
   methods: {
@@ -244,13 +299,50 @@ export default {
       this.sec = this.$route.query.sec || 0;
     },
     initWxShareFn() {
-      // 微信分享
-      this.wxShareTitle = this.$route.meta.title;
-      // this.wxShareDesc = this.$route.meta.wxShareDesc || '默认描述信息';
-      this.wxShareDesc = this.detail.title;
-      this.wxShareUrl = window.location.href;
-      this.wxShareImage = this.detail.bannerUrl;
-      this.wxShareFn();
+      this.$nextTick(() => {
+        // 微信分享
+        this.wxShareTitle = this.detail.title;
+        // this.wxShareDesc = this.$route.meta.wxShareDesc || '默认描述信息';
+        this.wxShareDesc = (document.querySelector('#shareDesc') && document.querySelector('#shareDesc').innerText) || window.location.href;
+        this.wxShareUrl = window.location.href;
+        this.wxShareImage = this.detail.bannerUrl;
+        this.wxShareFn();
+      });
+    },
+    getNetworkType() {
+    // 获取网络状态,wifi net 流量
+      let ua = navigator.userAgent;
+      let networkStr = ua.match(/NetType\/\w+/) ? ua.match(/NetType\/\w+/)[0] : 'NetType/other';
+      networkStr = networkStr.toLowerCase().replace('nettype/', '');
+      let networkType;
+      console.log(networkStr);
+      switch (networkStr) {
+        case 'wifi':
+          networkType = 'wifi';
+          break;
+        case '5g':
+          networkType = 'net';
+          break;
+        case '4g':
+          networkType = 'net';
+          break;
+        case '3g':
+          networkType = 'net';
+          break;
+        case '3gnet':
+          networkType = 'net';
+          break;
+        case '2g':
+          networkType = 'net';
+          break;
+        default:
+          networkType = 'error';
+      }
+      return networkType;
+    },
+    // 会员免费学 tip
+    showTip() {
+      this.tipShow = !this.tipShow;
     },
     // 获取视频地址
     getVideoUrlFn() {
@@ -268,6 +360,7 @@ export default {
         });
       }
     },
+    // 消耗权益继续观看
     continueShow() {
       if (this.isCanRequest) {
         this.isCanRequest = false;
@@ -279,20 +372,29 @@ export default {
         this.isCanRequest = true;
         if (res.data.code === '0000') {
           this.isShowDialogToIn = false;
+          // 重定义icon图标
+          for (let i = 0; i < this.detail.courseVideoEntity.length; i += 1) {
+            if (!this.token) {
+              // console.log('未登录');
+              this.detail.courseVideoEntity[i].icon = 'icon-bofang';
+            } else if (this.detail.courseVideoEntity[i].duration > 0) {
+              if (this.detail.courseVideoEntity[i].isComplete === 1) {
+                this.detail.courseVideoEntity[i].icon = 'icon-wancheng';
+              } else {
+                this.detail.courseVideoEntity[i].icon = 'icon-jilu';
+              }
+            } else {
+              this.detail.courseVideoEntity[i].icon = 'icon-bofang';
+            }
+          }
           this.startPlay();
         } else {
-          this.$message({
-            message: '消耗权益失败，请重试',
-            type: 'warning',
-          });
+          this.$message('消耗权益失败，请重试');
         }
       }).catch((err) => {
         this.isCanRequest = true;
         console.log(err);
-        this.$message({
-          message: '消耗权益失败，请重试',
-          type: 'warning',
-        });
+        this.$message('消耗权益失败，请重试');
       });
     },
     // 流量继续播放
@@ -303,11 +405,16 @@ export default {
     },
     // 开始播放
     startPlay() {
-      console.log(getNetworkType());
-      if (getNetworkType() === 'net' && !this.continueOn) {
+      if (this.getNetworkType() === 'net' && !this.continueOn) {
         this.continueOnShow = true;
         return;
       }
+      this.isShowDialogTomes = false;
+      this.isShowDialogToBuy = false;
+      this.isShowDialogToIn = false;
+      this.goWebBuyShow = false;
+      this.consumeShow = false;
+
       this.isShowIframeImg = false;
       this.courseId = this.curPlayItem.courseId;
       this.videoId = this.curPlayItem.id;
@@ -392,6 +499,7 @@ export default {
       this.isShowDialogToBuy = false;
       this.isShowDialogToIn = false;
       this.goWebBuyShow = false;
+      this.consumeShow = false;
       if (type === 0) {
         // 展示评论
         this.isShowDialogTomes = true;
@@ -403,6 +511,8 @@ export default {
         this.isShowDialogToBuy = true;
       } else if (type === 3) {
         this.goWebBuyShow = true;
+      } else if (type === 4) {
+        this.consumeShow = true;
       }
     },
     checkUserIsCanPlay() {
@@ -424,8 +534,10 @@ export default {
           if (res.data.code === '1000') {
             // 可以观看
             this.startPlay();
-          } else if (res.data.code === '1001' || res.data.code === '1002') {
+          } else if (res.data.code === '1001') {
             this.showDialog(2);
+          } else if (res.data.code === '1002') {
+            this.showDialog(4);
           } else if (res.data.code === '1003') {
             // 消耗权益
             this.showDialog(1);
@@ -447,13 +559,12 @@ export default {
     jurisdictionFn() {
       if (this.detail.payType === '1') {
         videorights({ courseId: this.courseId }).then((res) => {
-          if (res.data.code !== '1000') {
+          if (res.data.code === '1000') {
+            this.footerBtnShow = false;
+          } else if (this.token) {
             for (let i = 0; i < this.detail.courseVideoEntity.length; i += 1) {
               this.detail.courseVideoEntity[i].icon = 'icon-suoding';
             }
-          }
-          if (res.data.code === '0002') {
-            this.$message(res.data.message);
           }
         }).catch((err) => {
           console.log(err);
@@ -480,6 +591,8 @@ export default {
           this.isColl = !this.isColl;
           if (this.isColl) {
             this.toast('已收藏');
+          } else {
+            this.toast('已取消收藏');
           }
         } else {
           this.$message(res.data.message);
@@ -498,71 +611,95 @@ export default {
               // favorite字段，是否收藏 0否 1是 默认0
               this.isColl = res.data.favorite;
               this.detail = res.data.course;
+              this.detail.text = ''
+              if (res.data.leaguerFree != ''){
+                  res.data.leaguerFree.forEach((item, index) => {
+                      if (index !== res.data.leaguerFree.length-1) {
+                          this.detail.text += `${item.name}、`;
+                      } else {
+                          this.detail.text += item.name;
+                      }
+                  });
+                  this.detail.text += '可享受免费观看权益';
+              }
 
-              this.detail.courseVideoEntity.forEach(item=>{
+              console.log(this.detail);
+              this.detail.courseVideoEntity.forEach(item => {
                   if (!this.token) {
                       console.log('未登录');
                       item.icon = 'icon-bofang'
-                  }else{
-                      if (item.duration > 0){
-                          item.icon = 'icon-jilu'
-                      }else if(item.isComplete == 1){
-                          item.icon = 'icon-wancheng'
-                      }else{
+                  } else {
+                      if (item.duration > 0) {
+                          if (item.isComplete == 1) {
+                              item.icon = 'icon-wancheng'
+                          }else{
+                              item.icon = 'icon-jilu'
+                          }
+                      } else {
                           item.icon = 'icon-bofang'
                       }
                   }
               })
               this.jurisdictionFn()
 
-            if (this.detail) {
-              // this.getList();
-              if (!this.isShowIframe) {
-                this.play(true);
-              }
-            }
 
+              if (this.detail) {
+                  // this.getList();
+                  if (!this.isShowIframe) {
+                      this.play(true);
+                  }
+              }
+          } else if (res.data.code === '7001') {
+              this.courseOut = true
+          }
             // 微信分享
             this.initWxShareFn();
-          }
-        }).catch((err) => {
-          console.log(err);
-        });
-      }
-    },
-    // 课程时间
-    getTime(list) {
-      let num = 0;
-      if (list) {
-        console.log(list);
-        list.forEach((item, index) => {
-          if (!(index === 0 && item.isTry === 1)) {
-            num += parseInt(item.videoMinute, 10);
-          }
-        });
-      }
+                    }).catch((err) => {
+                        console.log(err);
+                    });
+                }
+            },
+            // 课程时间
+            getTime(list) {
+                let num = 0;
+                if (list) {
+                    list.forEach((item, index) => {
+                        if (!(index === 0 && item.isTry === 1)) {
+                            num += parseInt(item.videoMinute, 10);
+                        }
+                    });
+                }
 
 
-      return `${parseInt(num / 60, 10)}小时${num % 60}分钟`;
+                return `${num}分钟`;
+            },
+            // 章节时间
+            getMinite(min) {
+                let hour = parseInt(min / 60, 10) > 10 ? parseInt(min / 60, 10)
+                    : `0${parseInt(min / 60, 10)}`;
+                let minite = min % 60 >= 10 ? (min % 60) : `0${min % 60}`;
+                return `${hour}:${minite}:00`;
+            },
+            // 点击tabs
+            tavsClick(index) {
+                this.tabsActive = index;
+                this.tabShow = index;
+            },
+            // 跳转会员介绍
+            goVip() {
+                this.$router.push({path: '/vipInfo'});
+            },
+            routerBack() {
+                this.$router.push({path: '/index'});
+            }
+        },
+    beforeDestroy() {
+        Object.keys(this.initCourseRecordTimer).forEach((key) => {
+            clearInterval(this.initCourseRecordTimer[key]);
+        });
     },
-    // 章节时间
-    getMinite(min) {
-      let hour = parseInt(min / 60, 10) > 10 ? parseInt(min / 60, 10)
-        : `0${parseInt(min / 60, 10)}`;
-      let minite = min % 60 > 10 ? (min % 60) : `0${min % 60}`;
-      return `${hour}:${minite}:00`;
-    },
-    // 点击tabs
-    tavsClick(index) {
-      this.tabsActive = index;
-      this.tabShow = index;
-    },
-    // 跳转会员介绍
-    goVip() {
-      this.$router.push({ path: '/vipInfo' });
-    },
-  },
-};
+
+    };
 </script>
 <style lang="less" scoped>
     .vipInfo_outer {
@@ -572,8 +709,34 @@ export default {
         div {
             box-sizing: border-box;
         }
-        #playBox{
-            width: 1px; min-width: 100%; *width: 100%; height: 1px; min-height: 100%; *height: 100%;
+        #playBox {
+            width: 1px;
+            min-width: 100%;
+            *width: 100%;
+            height: 1px;
+            min-height: 100%;
+            *height: 100%;
+        }
+        .err_outer {
+            width: 100%;
+            padding-top: 30%;
+            text-align: center;
+            font-size: 17px;
+            .icon-out {
+                display: inline-block;
+                width: 50px;
+                height: 50px;
+                background: url("img/fenzu1454353443.png");
+                -webkit-background-size: 100% 100%;
+                background-size: 100% 100%;
+            }
+            span {
+                display: block;
+                line-height: 30px;
+            }
+            .back-btn {
+                color: #FB683C;
+            }
         }
 
         .header_outer {
@@ -592,11 +755,11 @@ export default {
             width: 100%;
             height: 173px;
             position: relative;
-            .iframe-box{
+            .iframe-box {
                 overflow: auto;
-                -webkit-overflow-scrolling:touch;
-                width:100%;
-                height:100%;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+                height: 100%;
             }
             .block_outer {
                 position: absolute;
@@ -677,10 +840,57 @@ export default {
                     .green {
                         color: #2DAF53;
                     }
+                    .orange {
+                        color: #FF7700;
+                        small {
+                            position: relative;
+                            font-size: 8px;
+                            display: inline-block;
+                            width: 12px;
+                            height: 12px;
+                            border-radius: 50%;
+                            background-color: #FF7700;
+                            color: #fff;
+                            text-align: center;
+                            line-height: 12px;
+                        }
+                        .tip_outer{
+                            width: 130px;
+                            position: absolute;
+                            padding: 5px 10px;
+                            left: 20px;
+                            top: -10px;
+                            background-color: rgba(0,0,0,.8);
+                            color: #FF7700;
+                            font-size: 12px;
+                            line-height: 15px;
+                            border-radius: 4px;
+                            &:after {
+                                content: "";
+                                position: absolute;
+                                left: -16px;
+                                top: 8px;
+                                width: 0;
+                                height: 0;
+                                border: 8px solid rgba(0,0,0,.8);
+                                border-top-color: transparent;
+                                border-left-color: transparent;
+                                border-bottom-color: transparent;
+
+                            }
+                        }
+                    }
                 }
                 span {
                     font-size: 14px;
                     color: #444;
+                }
+                .title{
+                    display: block;
+                    width: 100%;
+                    word-wrap: break-word;
+                    word-break: break-all;
+                    /*overflow: hidden;*/
                 }
 
             }
@@ -774,7 +984,7 @@ export default {
                 text-align: center;
                 line-height: 48px;
                 font-size: 17px;
-                &:active{
+                &:active {
                     background-color: #d85a34;
                 }
             }
@@ -833,6 +1043,11 @@ export default {
                         }
                         .icon-wancheng {
                             background: url("img/wancheng.png");
+                            -webkit-background-size: 100% 100%;
+                            background-size: 100% 100%;
+                        }
+                        .icon-suoding1 {
+                            background: url("img/suoding43434.png");
                             -webkit-background-size: 100% 100%;
                             background-size: 100% 100%;
                         }

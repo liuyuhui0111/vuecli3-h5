@@ -9,10 +9,12 @@
         <span class="level"
         @click="routerGo('/vipInfo')"
         v-if="(commonUserData.leaguerList &&
-        commonUserData.leaguerList.effective==0)
-        || !commonUserData.leaguerLevelName">
+        commonUserData.leaguerList.effective==0)">
           您的会员已到期，去续费
         </span>
+        <span class="level"
+        @click="routerGo('/vipInfo')"
+        v-else-if="!commonUserData.leaguerLevelName">您尚未开通会员，去开通</span>
         <span class="level" v-else>{{commonUserData.leaguerLevelName}}</span>
       </div>
     </div>
@@ -26,7 +28,7 @@
       {{item.text}}
       </div>
     </div>
-    <div v-if="this.token" class="loginout">
+    <div v-if="token" class="loginout">
       <span @click="loginoutFn" class="active">
         退出登录
       </span>
@@ -56,13 +58,8 @@ export default {
       ],
     };
   },
-  mounted() {
-    this.init();
-  },
   methods: {
-    init() {
-      console.log(this.token);
-    },
+
     itemClick(item) {
       this.routerGo(item.path);
     },

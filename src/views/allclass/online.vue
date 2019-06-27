@@ -21,7 +21,14 @@
       <!-- 线上课 -->
       <div class="empty" v-show="list.length<1 && isShowPage">
         <span class="icon-empty"></span>
-          <p @click="routerReplace('/offline')">暂无线上课程~ <br>先去学习一下公开课吧！</p>
+        <template v-if="allCount>0">
+          <p @click="routerReplace('/offline')">没有搜索到相关课程~ <br>
+          <span class="active">换个条件试试吧！</span></p>
+        </template>
+        <template v-else>
+          <p @click="routerReplace('/offline')">暂无线上课程~ <br>
+          <span class="active">先去学习一下公开课吧！</span></p>
+        </template>
       </div>
       <div v-if="list.length>0" class="view-wrapper">
         <cube-scroll
@@ -39,7 +46,9 @@
             <ClassCard @cardClick="cardClick"
             :item="item" page="list"></ClassCard>
           </div >
+
           </div>
+          <div class="h80"></div>
           <template slot="pullup" slot-scope="props">
         <div v-if="props.isPullUpLoad" class="tips">
           加载中...
@@ -50,8 +59,8 @@
         </template>
         </cube-scroll>
         <!-- 返回顶部 -->
-  <BackTop @backTop="scrollToTop"
-  :isShowBackTop="isShowBackTop"></BackTop>
+        <BackTop @backTop="scrollToTop"
+        :isShowBackTop="isShowBackTop"></BackTop>
       </div>
 
 
@@ -123,17 +132,12 @@ export default {
         },
       ],
       isShowBackTop: false, // 返回顶部
-
+      allCount: 0,
     };
   },
   components: {
     ClassCard,
     OnlineNav,
-  },
-  watch: {
-    $route() {
-      this.init();
-    },
   },
   computed: {
     options() {
@@ -152,6 +156,13 @@ export default {
       } : false;
     },
   },
+  activated() {
+    this.$nextTick(() => {
+      /*eslint-disable*/ 
+      this.$refs.onlinescroll && this.$refs.onlinescroll.refresh();
+      /* eslint-enable */
+    });
+  },
 
   mounted() {
     this.init();
@@ -160,7 +171,6 @@ export default {
     init() {
       this.pageNum = 1;
       this.total = 0;
-      this.isShowPage = false;
       this.list = [];
       // this.$refs.cubelist.reset();
       this.params.categoryId = this.$route.query.nid || ''; // 方向专业id
@@ -224,9 +234,9 @@ export default {
       let opt = { isHideLoading: true };
       if (t === 'init') {
         this.pageNum = 1;
-        opt = {};
         this.list = [];
         this.isShowPage = false;
+        opt = {};
         this.isShowBackTop = false;
       }
       if (this.list.length >= this.total && t !== 'init') {
@@ -249,8 +259,13 @@ export default {
               res.data.list.forEach((item) => {
                 item.pic = item.bannerUrl;
               });
-             
-            this.list = this.list.concat(res.data.list);
+             if(t==='init'){
+
+              this.list = JSON.parse(JSON.stringify(res.data.list));
+             }else{
+              this.list = this.list.concat(res.data.list);
+             }
+            
 
             if (this.list.length >= res.data.total && t !== 'init') {
               this.$refs.onlinescroll.forceUpdate();
@@ -265,6 +280,7 @@ export default {
           }
            /* eslint-enable */
           this.total = res.data.total;
+          this.allCount = res.data.allCount || 0;
         }
       }).catch((err) => {
         console.log(err);
@@ -296,6 +312,12 @@ export default {
   }
 </style>
 <style scoped>
+.h80{
+  height: 80px;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
 .tips{
   display: block;
   width: 100%;
@@ -303,6 +325,10 @@ export default {
   text-align: center;
   font-size: 12px;
   padding: 30px 0;
+  height: 20px;
+  line-height: 20px;
+  position: absolute;
+  bottom: 0;
 }
   .allclass{
     padding-bottom: 50px;

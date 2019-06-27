@@ -146,6 +146,10 @@ export default {
   mounted() {
     this.init();
   },
+  activated() {
+    this.isShowMark = false;
+    this.listIndex = -1;
+  },
   props: {
     navlistData: { // 方向专业数据
       type: Array,

@@ -1,16 +1,18 @@
 let baseProxyUrl = '';
-let publicPath = process.env.NODE_ENV === 'development' ? '/' : process.env.VUE_APP_PATH; // 生产环境发布路径
+let publicPath = process.env.NODE_ENV === 'development' ? './' : process.env.VUE_APP_PATH; // 生产环境发布路径
 
 /*eslint-disable*/
-baseProxyUrl = process.env.VUE_APP_URL;  //dev使用测试环境数据  需要连本地调试 屏蔽此行代码
+//dev使用测试环境数据  需要连本地调试 屏蔽此行代码baseProxyUrl
+baseProxyUrl = process.env.NODE_ENV === 'development' ? process.env.VUE_APP_URL : '';
 
 
 let proxyData = {
     'http://test.5ifapiao.com:8888': [
-    // '/fatscourse',
-    '/ele-myinvoice','/course_authentication', '/course_api-gateway'
-    ],    //分享
-    'http://10.1.28.167:9983': ['/fatscourse'],
+        '/fatscourse',
+        '/ele-myinvoice', '/course_authentication', '/course_api-gateway'
+    ], //分享
+    // 'http://10.1.28.167:9983': ['/fatscourse'],
+    // 'http://10.1.28.153:9983': ['/fatscourse'],
 };
 
 let proxy = {};
@@ -44,36 +46,36 @@ module.exports = {
     },
 
     // 生产环境是否需要sourcemap
-    productionSourceMap:false,
+    productionSourceMap: false,
 
     chainWebpack: config => {
-      // 移除 prefetch 插件
-      config.plugins.delete('prefetch');
+        // 移除 prefetch 插件
+        config.plugins.delete('prefetch');
     },
 
     configureWebpack: config => {
-      // 去除生产环境console.log
-      if (process.env.NODE_ENV === 'production') {
-        config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
-      }
+        // 去除生产环境console.log
+        if (process.env.NODE_ENV === 'production') {
+            config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
+        }
     },
 
     css: {
-      loaderOptions: {
-        stylus: {
-          'resolve url': true,
-          'import': [
-            './src/theme'
-          ]
+        loaderOptions: {
+            stylus: {
+                'resolve url': true,
+                'import': [
+                    './src/theme'
+                ]
+            }
         }
-      }
     },
 
     pluginOptions: {
-      'cube-ui': {
-        postCompile: true,
-        theme: true
-      }
+        'cube-ui': {
+            postCompile: true,
+            theme: true
+        }
     }
 };
 

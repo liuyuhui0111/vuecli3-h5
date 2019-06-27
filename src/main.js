@@ -10,21 +10,23 @@ import mixin from './mixin';
 import App from './App.vue';
 // swiper 样式文件
 /* eslint-disable */
-import '@/plugins/swiper/swiper.css';
 
 import COMMON_ENV from '@/config/env';
 import VueLazyload from 'vue-lazyload';
 import 'amfe-flexible'
+// fastclick
+import FastClick from 'fastclick'
 /* eslint-enable */
 // 全局公共样式文件,element-ui,swiper 样式调整文件
 require('@/assets/styles/common.css');
-require('@/assets/styles/reset-swiper.css');
+
+FastClick.attach(document.body);
 
 /* eslint-disable */
 Vue.use(VueLazyload, {
     preLoad: 1.3,
-    error: require('./assets/imgs/error.png'),
-    loading: require('./assets/imgs/loadding.png'),
+    error: require('@/assets/imgs/error.png'),
+    loading: require('@/assets/imgs/loadding.png'),
     attempt: 1,
 });
 
@@ -39,3 +41,4 @@ window.vue = new Vue({
 }).$mount('#app');
 
 window.COMMON_ENV = COMMON_ENV;
+// window.env = process.env;

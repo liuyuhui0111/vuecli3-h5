@@ -1,6 +1,9 @@
 <template>
   <div class="layout">
-    <router-view></router-view>
+    <keep-alive>
+      <router-view v-if="$route.meta.keepAlive"></router-view>
+    </keep-alive>
+    <router-view v-if="!$route.meta.keepAlive"></router-view>
     <!-- 首页底部导航 -->
     <FootNav></FootNav>
 
@@ -48,11 +51,6 @@ export default {
     quickNav,
   },
   watch: {
-    $route() {
-      if (!this.$route.meta.isHideShare) {
-        this.initWxShareFn();
-      }
-    },
     isShowLoading() {
       // 全局loadding
       if (this.isShowLoading) {
@@ -61,33 +59,30 @@ export default {
         this.$loading().close();
       }
     },
+    token() {
+      if (!this.token && !this.$route.meta.isNeedLogin) {
+        this.getTokenByCode();
+      }
+    },
   },
   mounted() {
     this.init();
   },
   methods: {
     init() {
-      /*eslint-disable*/
-      // let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsaWNlbnNlIjoibWFkZSBieSBoZWF2ZW4iLCJ1c2VyX25hbWUiOiJsaXV5dWh1aUBlbGUtY2xvdWQuY29tIiwic2NvcGUiOlsic2VydmVyIl0sImV4cCI6MTU2MDUxNTE4MiwidXNlcklkIjoxMzcyLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwianRpIjoiY2RhM2QwM2ItZDEwYy00ZDU5LWIzMmMtNTExY2QzYmM3Yzg5IiwiY2xpZW50X2lkIjoiZmF0YyJ9.fIp3qjIvaDfnrI9kRChr3sHOjWVVLB7H-jvYffkVw2Q';
-      // this.setToken(token);
-      /* eslint-enable */
-      if (!this.$route.meta.isHideShare) {
-        this.initWxShareFn();
-      }
       // 获取公司主体信息
-      if (!this.COMMON_COMP_DATA.tel && !this.COMMON_COMP_DATA.qq) {
+      if (!this.COMMON_COMP_DATA.logoUrl) {
         this.getSourceDataFn();
       }
+      if ((!this.commonUserData || !this.commonUserData.userName)
+        && this.token) {
+        this.getUserInfoFn();
+      }
+      if (!this.token && !this.$route.meta.isNeedLogin) {
+        this.getTokenByCode();
+      }
     },
-    initWxShareFn() {
-      this.wxShareTitle = this.$route.meta.wxShareTitle
-  || this.$route.meta.title || '优税学院';
-      // this.wxShareDesc = this.$route.meta.wxShareDesc || '默认描述信息';
-      this.wxShareDesc = this.$route.path || '默认描述信息';
-      this.wxShareUrl = window.location.href;
-      this.wxShareImage = `${window.location.origin + this.publicPath}logo.png`;
-      this.wxShareFn();
-    },
+
     // getTokenByCode(){
     //   // 重写该方法  防止重复调用
     // },

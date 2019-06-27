@@ -27,15 +27,25 @@
             <div class="line">
               <div class="linebox">
               <span class="activeline"
-              :style="{width:nums+'%'}"></span>
+              :style="{width:props.item.proportion}"></span>
               </div>
               <span class="num" :title="props.item.title"
-              :class="{active:nums==100}">{{nums}}%</span>
+              :class="{active:props.item.proportion=='100%'}">{{props.item.proportion}}</span>
             </div>
           </template>
           </ClassCard>
         </div >
+
         </div>
+        <div class="h80"></div>
+        <template slot="pullup" slot-scope="props">
+          <div v-if="props.isPullUpLoad" class="tips">
+            加载中...
+          </div>
+          <div v-else class="tips">
+            已经到底了~
+          </div>
+          </template>
       </cube-scroll>
         <!-- 返回顶部 -->
       <BackTop @backTop="scrollToTop"
@@ -47,7 +57,7 @@
 </template>
 <script>
 import {
-  getCourseList,
+  queryClassList,
 } from '@/api/apis';
 import ClassCard from '@/views/components/card.vue';
 
@@ -65,14 +75,9 @@ export default {
       pullUpLoadMoreTxt: '上拉加载',
       pullUpLoadNoMoreTxt: '已经到底了~',
       isShowBackTop: false, // 返回顶部
-      nums: 100, // 观看百分比值
 
-      params: { // 线上课筛选字段
-        type: 1, // 课程类型 1：视频课 2：专题课
-        payType: '', // 付费状态 0 免费 1付费 ''全部
-        categoryId: '', // 分类id
-        boolean: 0, // boolean == 1 那么查询最热  否则查询最新~~~~
-        difficult: '', // 难度 初1 中2高3 ''全部
+      params: {
+        isComplete: '', // 查询全部
       },
     };
   },
@@ -84,14 +89,14 @@ export default {
       this.init();
     },
   },
-  mounted() {
+  created() {
     this.init();
   },
   computed: {
     options() {
       return {
         pullUpLoad: this.pullUpLoadObj,
-        scrollbar: true,
+        scrollbar: false,
       };
     },
     pullUpLoadObj() {
@@ -133,14 +138,15 @@ export default {
         this.isShowPage = false;
         this.isShowBackTop = false;
       }
+      /*eslint-disable*/ 
       if (this.list.length >= this.total && t !== 'init') {
-        this.$refs.learnlistScroll.forceUpdate();
+        this.$refs.learnlistScroll && this.$refs.learnlistScroll.forceUpdate();
         return;
       }
       let { pageNum } = this;
       let { pageSize } = this;
       // this.total = 0;
-      getCourseList({
+      queryClassList({
         pageNum,
         pageSize,
         ...this.params,
@@ -149,7 +155,6 @@ export default {
           this.isShowPage = true;
           this.pageNum += 1;
           if (res.data.list.length > 0) {
-            /*eslint-disable*/ 
               res.data.list.forEach((item) => {
                 item.pic = item.bannerUrl;
               });
@@ -157,7 +162,7 @@ export default {
             this.list = this.list.concat(res.data.list);
 
             if (this.list.length >= res.data.total && t !== 'init') {
-              this.$refs.learnlistScroll.forceUpdate();
+              this.$refs.learnlistScroll && this.$refs.learnlistScroll.forceUpdate();
             }
 
             if (t === 'init') {
@@ -172,7 +177,7 @@ export default {
         }
       }).catch((err) => {
         console.log(err);
-        this.$message('线上课列表获取失败，请稍后再试');
+        this.$message('最近学习列表获取失败，请稍后再试');
       });
     },
 
@@ -181,6 +186,24 @@ export default {
 };
 </script>
 <style scoped>
+.h80{
+  height: 80px;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+.tips{
+  display: block;
+  width: 100%;
+  color: #868686;
+  text-align: center;
+  font-size: 12px;
+  padding: 30px 0;
+  height: 20px;
+  line-height: 20px;
+  position: absolute;
+  bottom: 0;
+}
 .line{
   position: relative;
   width: 100%;

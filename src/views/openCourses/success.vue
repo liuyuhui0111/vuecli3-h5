@@ -2,6 +2,7 @@
   <div class="success">
     <div class="icon-success">报名成功</div>
     <p>请保持手机畅通稍后课程顾问会联系您哒</p>
+    <span @click="routerBack" class="back-btn">返回首页</span>
   </div>
 </template>
 <script>
@@ -19,6 +20,9 @@ export default {
     init() {
 
     },
+    routerBack() {
+      this.$router.push({ path: '/index' });
+    },
   },
 };
 </script>
@@ -28,7 +32,8 @@ export default {
   padding-top: 19%;
   text-align: center;
   font-size: 14px;
-color: #FB683C;
+/*color: #FB683C;*/
+  line-height: 20px;
 letter-spacing: -0.68px;
 }
 .icon-success{
@@ -44,4 +49,9 @@ letter-spacing: -0.68px;
   box-sizing:border-box;
   margin: 0 auto 15px auto;
 }
+  .back-btn{
+    font-size: 17px;
+    color: #FB683C;
+    line-height: 25px;
+  }
 </style>

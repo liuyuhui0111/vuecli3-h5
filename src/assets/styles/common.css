@@ -19,6 +19,7 @@ font-family:Helvetica,Arial,sans-serif;
 font-size:12px;
 padding:0;
 text-align:left;
+line-height: 0;
 }
 select {
 font-size:12px;
@@ -84,6 +85,7 @@ display:none;
 /*设置默认字体*/
 body{
 	font-family: 'PingFangSC-Medium','Avenir', Helvetica, Arial, sans-serif;
+    line-height: 0;
 }
 input,textarea{
   color: #444;
@@ -227,4 +229,14 @@ html body .active{
   color: #868686;
   font-size: 12px;
   text-align: center;
+}
+
+.cube-toast-icon{
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+}
+.cube-dialog-title-def{
+  padding: 5px 0;
 }

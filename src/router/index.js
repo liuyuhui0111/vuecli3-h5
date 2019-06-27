@@ -2,14 +2,10 @@
 
 import Vue from 'vue'
 import Router from 'vue-router'
-import store from '@/store'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import childRoutes from '@/router/routes'
-import {
-  goLogin,
-} from '@/api/apis';
-
+import {COMMON_REPLACE_URL} from '@/assets/utils/util'
 Vue.use(Router);
 
 
@@ -59,19 +55,52 @@ let routes = initRoutes(routeConfs);
 
 
 let router = new Router({
-  mode: 'history',
-  base:process.env.NODE_ENV === 'development' ? '/' : process.env.VUE_APP_PATH,
+  mode: 'hash',
+  // base:process.env.NODE_ENV === 'development' ? '/' : process.env.VUE_APP_PATH,
   routes: routes
 });
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || '加载中...'
-  NProgress.start();
-  next();
+  
+   if(window.location.href.indexOf(COMMON_REPLACE_URL) !== -1){
+
+    let href = window.location.href.substring(0, window.location.href.length - 2);
+    let host = href.split('?')[0];
+    let queryList = href.split('?')[1].split('&');
+    let query = '';
+    let path = '';
+    if(queryList.length>0){
+      let i = -1;
+      queryList.forEach((item,index)=>{
+        if(item.indexOf(COMMON_REPLACE_URL)===0){
+          path = decodeURIComponent(item.split('=')[1])
+          i=index;
+        }
+      });
+      if(i!=-1){
+        queryList.splice(i,1);
+      }
+    }
+      query = queryList.join('&');
+      // debugger
+      console.log(host+'#/'+path+'?'+query);
+      if(from.name){
+        query = query + '&f=' + from.name
+      }
+    if(query){
+      window.location.href = host+'#/'+path+'?'+query;
+    }else{
+      window.location.href = host+'#/'+path
+    }
+    
+  }else{
+    document.title = to.meta.title || '加载中...'
+    NProgress.start();
+    next();
+  }
 })
 
 router.afterEach((to, from) => {
   NProgress.done();
-  // ...
 })
 
 export default router

@@ -56,39 +56,24 @@ function setScrollTop(top) {
     document.body.scrollTop = top;
   }
 }
-// 将url中code=xxx 替换成空字符串
-// function replaceCode() {
-//   /*eslint-disable*/
-//     const reg = /code\=\w*(&|$)/;
-//     let href = window.location.href;
-//     href=href.replace(reg, '');
-//     if (href.substr(href.length - 1, 1) === '?' || href.substr(href.length - 1, 1) === '&') {
-//         // 如果最后一个字符是？
-//         href = href.substring(0, href.length - 1);
-//     }
-//  /* eslint-enable */
-//   href = href.replace('#', COMMON_REPLACE_URL);
-
-//   return href;
-// }
 
 // 将url中code=xxx 替换成空字符串
-function replaceCode() {
+function replaceCode(url) {
   /*eslint-disable*/
     const reg = /code\=\w*(&|$)/;
-    let href = window.location.href;
-    // let host = href.split('#')[0];
+    let href = url || window.location.href;
+    let host = href.split('#')[0];
 
-    //     // ie9  不支持history模式 hash模式
+        // ie9  不支持history模式 hash模式
 
-    //     let hashArr = window.location.hash.replace('#', '').split('?');
-    //     let path = encodeURIComponent(hashArr[0].substring(1, hashArr[0].length)); // path
-    //     // 把参数截取成数组[a=1,b=2]
-    //     // let queryList = hashArr[1]?hashArr[1].split('&'):[];
-    //     let query = hashArr[1] ? `&${hashArr[1]}` : '';
-    //     // 取消 #号  拼接成 ?path=path
+        let hashArr = window.location.hash.replace('#', '').split('?');
+        let path = encodeURIComponent(hashArr[0].substring(1, hashArr[0].length)); // path
+        // 把参数截取成数组[a=1,b=2]
+        // let queryList = hashArr[1]?hashArr[1].split('&'):[];
+        let query = hashArr[1] ? `&${hashArr[1]}` : '';
+        // 取消 #号  拼接成 ?path=path
 
-    //     href = host + `?${COMMON_REPLACE_URL}=${path}${query}`;
+        href = host + `?${COMMON_REPLACE_URL}=${path}${query}`;
 
         href=href.replace(reg, '');
         if (href.substr(href.length - 1, 1) === '?' || href.substr(href.length - 1, 1) === '&') {
@@ -195,6 +180,43 @@ function getNetworkType() {
   return networkType;
 }
 
+function getSystem() {
+  // 获取系统环境
+  /*eslint-disable*/
+  let sys = {
+    wx: false,
+    android: false,
+    ios: false,
+  };
+  let ua = window.navigator.userAgent;
+  let wxua = window.navigator.userAgent.toLowerCase();
+  if (wxua.match(/MicroMessenger/i) == 'micromessenger') {
+    sys.wx = true;
+  } else {
+    sys.wx = false;
+  }
+  sys.android = ua.indexOf('Android') > -1 || ua.indexOf('Linux') > -1;
+  sys.ios = !!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+  /* eslint-enable */
+  return sys;
+}
+
+function paramsStr(url) {
+  /*eslint-disable*/
+  let hash;
+  let myJson = {};
+  if (!url) {
+    return myJson;
+  }
+  let hashes = url.slice(url.indexOf('?') + 1).split('&');
+  for (let i = 0; i < hashes.length; i++) {
+    hash = hashes[i].split('=');
+    myJson[hash[0]] = hash[1];
+  }
+  return myJson;
+  /* eslint-enable */
+}
+
 export {
   COMMON_REPLACE_URL,
   setTokenFn,
@@ -209,4 +231,6 @@ export {
   initList,
   transferString,
   getNetworkType,
+  getSystem,
+  paramsStr,
 };

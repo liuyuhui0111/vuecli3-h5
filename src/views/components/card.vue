@@ -18,6 +18,11 @@
           <template v-if="item.state==2">
             <span class="classstop">已结束</span>
           </template>
+          <template v-if="item.price && item.price!='0' &&
+          item.leaguerFreeFlag!=0
+          && item.type == '1'">
+            <span class="classstop">会员免费</span>
+          </template>
         </div>
         <div class="intro">
 
@@ -30,6 +35,7 @@
           </div>
           <!-- 线下课展示信息 -->
           <template v-if="item.type == '2'">
+            <slot name="onlineIntro" :item="item">
             <div class="teacher ellipsis">
               <span>主讲：{{item.teacherName}}</span>
               <span class="address">
@@ -44,6 +50,7 @@
               <span class="money"
               :class="{free:item.price==0}">{{item.price==0?'免费':'￥'+item.price}}</span>
             </div>
+            </slot>
           </template>
 
           <!-- 线上课数据 -->
@@ -51,7 +58,11 @@
             <slot name="onlineIntro" :item="item">
               <div class="price">
                 <span class="money"
-                :class="{free:item.price==0}">{{item.price==0?'免费':'￥'+item.price}}</span>
+              v-if="item.leaguerFreeFlag==0 || item.price==0"
+              :class="{free:item.price==0}">{{item.price==0?'免费':'￥'+item.price}}</span>
+              <span class="money vipfree"
+              v-if="item.leaguerFreeFlag!=0 && item.price!=0"
+              >{{'￥'+item.price}}</span>
                 <span class="learnNum">{{item.learnNum}}人已学</span>
               </div>
             </slot>
@@ -88,8 +99,6 @@ export default {
       default: () => '',
     },
   },
-  mounted() {
-  },
   methods: {
     getTime() {
       let { item } = this;
@@ -102,6 +111,20 @@ export default {
 .class-card{
   display: block;
   width: 100%;
+}
+.vipfree i{
+  font-style: normal;
+  display: inline-block;
+  background: #FF7700;
+border-radius: 4px;
+border-radius: 4px;
+width: 50px;
+height: 18px;
+line-height: 18px;
+text-align: center;
+font-size: 10px;
+color:#fff;
+margin-left: 5px;
 }
 .card-box{
   position: relative;
@@ -159,6 +182,8 @@ export default {
 .teacher{
   margin-top: 5px;
   height: 17px;
+  line-height: 17px;
+  font-size: 14px;
 }
 .address{
   margin-left: 8px;
@@ -176,11 +201,12 @@ export default {
   margin-top: 10px;
   margin-bottom: 5px;
 }
+.intro .price,
 .card-box.list .price{
-  height: 16px;
-  line-height: 16px;
-  margin-top: 2px;
+  height: 20px;
+  line-height: 20px;
   overflow: hidden;
+  font-size: 0;
 }
 .card-box.list .onlinelist{
   margin-bottom: 45px;
@@ -198,5 +224,6 @@ export default {
 .learnNum{
   color: #868686;
   float: right;
+  font-size: 12px;
 }
 </style>

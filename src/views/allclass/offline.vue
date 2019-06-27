@@ -15,7 +15,8 @@
       <div class="empty" v-if="list.length<1 && isShowPage">
         <span class="icon-empty"></span>
         <template>
-          <p @click="routerReplace('/online')">暂无线上公开课~ <br>先去学习一下线上课程吧！</p>
+          <p @click="routerReplace('/online')">暂无线上公开课~ <br>
+            <span class="active">先去学习一下线上课程吧！</span></p>
         </template>
       </div>
       <div v-if="list.length>0" class="view-wrapper">
@@ -34,15 +35,17 @@
             <ClassCard  @cardClick="cardClick"
             :item="item" page="list"></ClassCard>
           </div >
+
           </div>
+          <div class="h80"></div>
           <template slot="pullup" slot-scope="props">
-        <div v-if="props.isPullUpLoad" class="tips">
-          加载中...
-        </div>
-        <div v-else class="tips">
-          已经到底了~
-        </div>
-        </template>
+          <div v-if="props.isPullUpLoad" class="tips">
+            加载中...
+          </div>
+          <div v-else class="tips">
+            已经到底了~
+          </div>
+          </template>
         </cube-scroll>
         <!-- 返回顶部 -->
   <BackTop @backTop="scrollToTop"
@@ -93,11 +96,6 @@ export default {
   components: {
     ClassCard,
   },
-  watch: {
-    $route() {
-      this.init();
-    },
-  },
   computed: {
     options() {
       return {
@@ -115,7 +113,13 @@ export default {
       } : false;
     },
   },
-
+  activated() {
+    this.$nextTick(() => {
+      /*eslint-disable*/ 
+      this.$refs.scroll && this.$refs.scroll.refresh();
+      /* eslint-enable */
+    });
+  },
   mounted() {
     this.init();
   },
@@ -123,7 +127,6 @@ export default {
     init() {
       this.pageNum = 1;
       this.total = 0;
-      this.isShowPage = false;
       this.list = [];
       this.onPullingUp('init');
     },
@@ -143,8 +146,6 @@ export default {
       let opt = { isHideLoading: true };
       if (t === 'init') {
         this.pageNum = 1;
-        this.list = [];
-        this.pullUpLoad = true;
         opt = {};
       }
       if (this.list.length >= this.total && t !== 'init') {
@@ -159,8 +160,12 @@ export default {
               res.data.list.forEach((item)=>{
                 item.type='2';
               })
-             
-          this.list = this.list.concat(res.data.list);
+          if(t==='init'){
+            this.list = res.data.list;
+          }else{
+            this.list = this.list.concat(res.data.list);
+          }
+          
           this.pageNum += 1;
           if (this.list.length >= res.data.total && t !== 'init') {
             this.$refs.scroll && this.$refs.scroll.forceUpdate();
@@ -187,6 +192,12 @@ export default {
   }
 </style>
 <style scoped>
+.h80{
+  height: 80px;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
 .tips{
   display: block;
   width: 100%;
@@ -194,6 +205,10 @@ export default {
   text-align: center;
   font-size: 12px;
   padding: 30px 0;
+  height: 20px;
+  line-height: 20px;
+  position: absolute;
+  bottom: 0;
 }
   .allclass{
     padding-bottom: 50px;

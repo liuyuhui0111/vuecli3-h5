@@ -13,6 +13,7 @@ export default new Vuex.Store({
 		requestLoading:false,			//请求LOADING
 		token:getTokenFn() ? getTokenFn() : '',		//token
 		COMMON_COMP_DATA:{},
+		fromRoute:'',			//来源路由path
 	},
 	getters: {},
 	actions: {},
@@ -25,6 +26,9 @@ export default new Vuex.Store({
 	  },
 	  setLoading(state,flag){
 	  	state.requestLoading = flag;
+	  },
+	  setFromRoute(state,path){
+	  	state.fromRoute = path || '';
 	  },
 	  setToken(state,token) {
 	  	// 设置token  同步到cookie 有效期默认7天

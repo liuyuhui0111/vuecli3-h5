@@ -9,7 +9,7 @@ import {
   // basic=========基础
   // Button,
   Loading,
-  // Tip,
+  Tip,
   // Toolbar,
   // TabBar,
   // TabPanels,
@@ -42,7 +42,7 @@ import {
   // scroll==============滚动
   Scroll,
   // RecycleList,
-  // Slide,
+  Slide,
   // IndexList,
   // Swipe,
   // Sticky,
@@ -54,7 +54,7 @@ import {
 Vue.use(Toast);
 // Vue.use(Button);
 Vue.use(Loading);
-// Vue.use(Tip);
+Vue.use(Tip);
 // Vue.use(Toolbar);
 // Vue.use(TabBar);
 // Vue.use(TabPanels);
@@ -83,7 +83,7 @@ Vue.use(Dialog);
 // Vue.use(Drawer);
 // Vue.use(ImagePreview);
 Vue.use(Scroll);
-// Vue.use(Slide);
+Vue.use(Slide);
 // Vue.use(IndexList);
 // Vue.use(Swipe);
 // Vue.use(Sticky);

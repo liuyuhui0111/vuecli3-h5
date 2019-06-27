@@ -1,14 +1,15 @@
 <template>
-  <div class="index">
+  <div v-if="showList.length>4" class="index">
     <cube-scroll ref="indexScroll"
+    :data="showList"
     :scrollEvents="['scroll']"
     @scroll="scroll">
     <!-- logo -->
-    <div class="logo">
+    <div @click="initWxShareFn()" class="logo">
       <baseImg
       :width="135"
       :height="46"
-      :src="logo">
+      :src="COMMON_COMP_DATA.logoUrl">
       </baseImg>
     </div>
     <!-- banner -->
@@ -105,18 +106,19 @@ import IndexNav from './nav.vue';
 import BaseTitle from '@/views/components/title.vue';
 import ClassCard from '@/views/components/card.vue';
 
+
 export default {
   name: 'index',
   data() {
     return {
       name: 'index',
-      logo: '',
       bannerList: [], // 轮播图
       showCourseOfflineList: [], // 线下公开课
       showCourseOnlineList: [], // 大家都在学
       getNewCourseListList: [], // 新鲜出炉
       getGroomCourseListList: [], // 推荐课程
       isShowBackTop: false, // 返回顶部
+      showList: [],
     };
   },
   mounted() {
@@ -128,9 +130,15 @@ export default {
     BaseTitle,
     ClassCard,
   },
+  activated() {
+    this.$nextTick(() => {
+      /*eslint-disable*/ 
+      this.$refs.indexScroll && this.$refs.indexScroll.refresh();
+      /* eslint-enable */
+    });
+  },
   methods: {
     init() {
-      this.logo = `${this.publicPath}logo.png`;
       // 获取轮播图
       this.showFoucusPicFn();
       // 获取线下公开课
@@ -167,17 +175,25 @@ export default {
     },
     showFoucusPicFn() {
       // 获取轮播图
-      showFoucusPic().then((res) => {
+      showFoucusPic({ type: '0' }).then((res) => {
+        this.showList.push(true);
         if (res.data.list) {
+          /*eslint-disable*/ 
+          res.data.list.forEach((item)=>{
+            item.image = item.pic;
+          })
+          /* eslint-enable */
           this.bannerList = res.data.list;
         }
       }).catch((err) => {
+        this.showList.push(true);
         console.log(err);
       });
     },
     showCourseOfflineFn() {
       // 线下公开课
-      showCourseOffline().then((res) => {
+      showCourseOffline({ pageSize: 2 }).then((res) => {
+        this.showList.push(true);
         if (res.data.list) {
           /*eslint-disable*/ 
           res.data.list.forEach((item)=>{
@@ -188,28 +204,32 @@ export default {
           this.showCourseOfflineList = res.data.list.slice(0, 2);
         }
       }).catch((err) => {
+        this.showList.push(true);
         console.log(err);
       });
     },
     showCourseOnlineFn() {
       // 大家都在学
-      showCourseOnline().then((res) => {
+      showCourseOnline({ pageSize: 6 }).then((res) => {
+        this.showList.push(true);
         if (res.data.list) {
           /*eslint-disable*/ 
           res.data.list.forEach((item)=>{
               item.pic = item.bannerUrl;
           })
           /* eslint-enable */
-          this.showCourseOnlineList = initList(res.data.list, 2).slice(0, 4);
+          this.showCourseOnlineList = initList(res.data.list, 2).slice(0, 6);
         }
       }).catch((err) => {
+        this.showList.push(true);
         console.log(err);
       });
     },
 
     getNewCourseListFn() {
       // 新鲜出炉
-      getNewCourseList().then((res) => {
+      getNewCourseList({ pageSize: 2 }).then((res) => {
+        this.showList.push(true);
         if (res.data.list) {
           let { list } = res.data;
           /*eslint-disable*/ 
@@ -220,13 +240,15 @@ export default {
           this.getNewCourseListList = res.data.list.slice(0, 2);
         }
       }).catch((err) => {
+        this.showList.push(true);
         console.log(err);
       });
     },
 
     getGroomCourseListFn() {
       // 推荐课程
-      getGroomCourseList().then((res) => {
+      getGroomCourseList({ pageSize: 4 }).then((res) => {
+        this.showList.push(true);
         let { list } = res.data;
         if (res.data.list) {
           /*eslint-disable*/ 
@@ -237,6 +259,7 @@ export default {
           this.getGroomCourseListList = initList(res.data.list, 4).slice(0, 4);
         }
       }).catch((err) => {
+        this.showList.push(true);
         console.log(err);
       });
     },
@@ -255,6 +278,15 @@ export default {
     bottom: 0;
     right: 0;
     box-sizing:border-box;
+  }
+  .index:after{
+    content: "";
+    display: block;
+    width: 100%;
+    position: fixed;
+    bottom: 0px;
+    height: 200px;
+    background: #f1f1f1;
   }
   .logo{
     display: block;

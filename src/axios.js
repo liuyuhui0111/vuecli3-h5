@@ -2,6 +2,10 @@ import Vue from 'vue';
 import Axios from 'axios';
 // import qs from 'qs';
 import store from './store';
+import {
+  replaceCode,
+} from '@/assets/utils/util';
+import COMMON_ENV from '@/config/env';
 
 const axios = Axios.create({
   timeout: 1000 * 60, // 超时时间60s
@@ -32,15 +36,17 @@ axios.interceptors.request.use(
         if(process.env.NODE_ENV === 'development'){
           config.headers.httpHost = process.env.VUE_APP_HOST;
         }
-        // config.headers.httpHost = "test.5ifapiao.com:8888";
 
-        if(!config.isHideLoading){
+        // config.headers.httpHost = "test.5ifapiao.com:8888";
+        if(!config.isHideLoading && config.method !== 'get'){
           // 如果不为true 请求提示loadding
           requestList.push(config.url);
           if(!COMMON_LOADING){
             COMMON_LOADING = true;
             store.commit('setLoading',true);
           }
+        }else{
+
         }
         // 添加headers "application/x-www-form-urlencoded"
         //如果是formdata格式 自动格式化数据
@@ -92,6 +98,11 @@ axios.interceptors.response.use(
             if(response.data.code === '0002' && store.getters.token){
               // 登录过期
               store.commit('setToken','');
+              // 退出登录
+              const REDIRECT_URI = encodeURIComponent(replaceCode());
+              window.localStorage.setItem('REDIRECT_URI', replaceCode());
+              const url = `/course_authentication/h5/logout?redirect_uri=${REDIRECT_URI}`;
+              window.location.replace(COMMON_ENV.SSO_URL + url);
             }
             return response;
     },

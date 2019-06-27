@@ -1,63 +1,59 @@
 // 微信jsApi
+import { replaceCode } from '@/assets/utils/util';
 /*eslint-disable*/ 
-export function wxConfig(data,fn){
+export function wxConfig(data,shareData){
   /*
   *微信config配置
   *window.CONFIG.DEV
   */
   if(wx){
     wx.config({
-      debug:true,
+      debug:false && process.env.NODE_ENV !== 'production',
       appId:data.appId,
       timestamp:data.timestamp,
       nonceStr:data.nonceStr,
       signature:data.signature,
-      jsApiList:[
-        'onMenuShareTimeline',
-        'onMenuShareAppMessage',
-        'onMenuShareQQ',
-        'onMenuShareWeibo',
-        'onMenuShareQZone',
-        'hideMenuItems',
-        'chooseImage',
-        'getLocalImgData'
-      ]
+      jsApiList: ["onMenuShareAppMessage", "onMenuShareTimeline","hideMenuItems"]
+      // jsApiList: ["updateAppMessageShareData", "updateTimelineShareData","hideMenuItems"]
     });
     wx.ready(()=>{
+      // alert("微信ready执行分享参数:"+JSON.stringify(shareData));
+      shareStart(shareData);
       hideShare();
-      if(fn){
-        fn()
-      }
+      
     });
     wx.error((res)=>{
-      alert(JSON.stringify(res))
-          console.log(res);
-        });
+      console.log(res);
+      // alert("微信error执行报错信息："+ JSON.stringify(res))
+    });
+  }else{
+    // alert("微信jssdk加载失败")
   }
 }
 
-
-export function wxShare(params){
-  /*
-  *微信分享  params{
-    title:"",   分享标题
-    desc:"",    分享描述
-    link:"",    分享URL
-    imgUrl:"",  分享imgUrl
-    success:function(){},  成功回调
-    cancel:function(){},   失败回调
-  }
-  */  
-  if(wx){
-    wx.onMenuShareTimeline(params)    //获取“分享到朋友圈”按钮点击状态及自定义分享内容接口（即将废弃）
-    wx.onMenuShareAppMessage(params)    //获取“分享给朋友”按钮点击状态及自定义分享内容接口（即将废弃）
-    wx.onMenuShareQQ(params)    //获取“分享到QQ”按钮点击状态及自定义分享内容接口
-    wx.onMenuShareWeibo(params)   //获取“分享到腾讯微博”按钮点击状态及自定义分享内容接口
-    wx.onMenuShareQZone(params)   //获取“分享到QQ空间”按钮点击状态及自定义分享内容接口
-  }
+export function shareStart(shareData){
+  // 分享到朋友圈
+  shareData.link = initWxShareUrl(shareData.link);
+  shareData.link = replaceCode(shareData.link);
+  wx.onMenuShareTimeline({
+    title: shareData.title, // 分享标题
+    link: shareData.link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+    imgUrl:shareData.imgUrl, // 分享图标
+    success: shareData.success,
+    cancel: shareData.cancel
+  });
+  // wx.updateAppMessageShareData({
+  //   title: shareData.title, // 分享标题
+  //   link: initWxShareUrl(shareData.link), // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+  //   imgUrl:shareData.imgUrl, // 分享图标
+  //   success: shareData.success,
+  //   cancel: shareData.cancel
+  // });
+  //分享给朋友
+  
+  wx.onMenuShareAppMessage(shareData);
+  // wx.updateAppMessageShareData(shareData);
 }
-
-
 export function hideShare(){
   // 批量隐藏功能按钮接口
   wx.hideMenuItems({
@@ -74,4 +70,22 @@ export function hideShare(){
 
     ] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
   });
+}
+export function initWxShareUrl(url){
+  // 删除链接里微信自动拼接的from isappinstalled sharer_username scene clicktime
+  const delFromReg = /from\=\w*(&|$)/;
+  const delsharer_username = /sharer_username\=\w*(&|$)/;
+  const delscene = /scene\=\w*(&|$)/;
+  const delclicktime = /clicktime\=\w*(&|$)/;
+  const delIsappinstalledReg = /isappinstalled\=\w*(&|$)/;
+  let href = url.replace(delFromReg,'')
+            .replace(delIsappinstalledReg,'')
+            .replace(delsharer_username,'')
+            .replace(delscene,'')
+            .replace(delclicktime,'');
+  if (href.substr(href.length - 1, 1) === '?' || href.substr(href.length - 1, 1) === '&') {
+    // 如果最后一个字符是？
+    href = href.substring(0, href.length - 1);
+  }
+  return href;
 }

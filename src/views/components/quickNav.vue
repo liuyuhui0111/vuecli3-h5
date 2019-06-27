@@ -40,8 +40,6 @@ export default {
       this.showActive = false;
     },
   },
-  computed: {
-  },
   methods: {
     showClick() {
       this.showActive = !this.showActive;
@@ -111,6 +109,9 @@ export default {
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
+                &:nth-child(2){
+                    width: 40px;
+                }
                 i{
                     display: inline-block;
                     width: 20px;

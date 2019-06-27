@@ -14,7 +14,9 @@ import {
   loginout,
   wxShare,
 } from '@/api/apis';
-import { replaceCode, getUrlParam } from '@/assets/utils/util';
+import {
+  getUrlParam, getSystem,
+} from '@/assets/utils/util';
 import baseImg from '@/views/components/img.vue';
 import BackTop from '@/views/components/backtop.vue';
 import {
@@ -27,7 +29,7 @@ export default {
       data() {
         return {
           // token: '',
-          publicPath: process.env.BASE_URL,
+          publicPath: process.env.BASE_URL || '/',
           wxShareTitle: '优税学院',
           wxShareUrl: '', // 分享地址
           wxShareImage: '', // 分享图片地址
@@ -36,12 +38,13 @@ export default {
           scrollInitHeight: 700,
         };
       },
-      mounted() {
-        this.scrollInitHeight = window.innerHeight;
-      },
-      components: {
-        BackTop,
-        baseImg,
+      watch: {
+        token() {
+          if (!this.token && this.$route.meta.isNeedLogin) {
+            // 如果是需要登录的页面；
+            this.login();
+          }
+        },
       },
       beforeRouteEnter(to, from, next) {
         if (to.meta.isNeedLogin) {
@@ -51,16 +54,39 @@ export default {
               // layout 直接退出
               return;
             }
+            vm.setFromRoute(from.path);
             if (!vm.token && !getUrlParam('code')) {
               vm.login();
-            } else if (!vm.token && getUrlParam('code')) {
+              return;
+            }
+            if (!vm.token && getUrlParam('code')) {
               // 获取token  下一周期 执行init
               vm.getTokenByCode(vm.init);
             }
+            if (!to.meta.isHideShare) {
+              vm.initWxShareFn();
+            }
           });
         } else {
-          next();
+          next((vm) => {
+            if (vm.name === 'common-layout') {
+              // layout 直接退出
+              return;
+            }
+            vm.setFromRoute(from.path);
+            if (!to.meta.isHideShare) {
+              vm.initWxShareFn();
+            }
+          });
         }
+      },
+
+      created() {
+        this.scrollInitHeight = window.innerHeight;
+      },
+      components: {
+        BackTop,
+        baseImg,
       },
       computed: {
         ...mapGetters([
@@ -70,6 +96,7 @@ export default {
           'COMMON_COMP_DATA', // 公司主体信息
           'netWorkError',
           'requestLoading',
+          'fromRoute',
         ]),
       },
       methods: {
@@ -85,10 +112,12 @@ export default {
 
         login(type) {
           // 去登录
+
           goLogin(type);
         },
         loginoutFn() {
           // 退出登录，清空cookie
+          let oThis = this;
           this.$createDialog({
             type: 'confirm',
             title: '提示',
@@ -100,9 +129,8 @@ export default {
               text: '取消',
             },
             onConfirm: () => {
-              this.setToken('');
+              oThis.setToken('');
               window.localStorage.removeItem('REDIRECT_URI');
-              window.location.replace(replaceCode());
               this.$nextTick(() => {
                 loginout();
               });
@@ -136,7 +164,6 @@ export default {
         },
         async getTokenByCode(fn) {
           const code = getUrlParam('code');
-          console.log('获取token=======0000');
           if (code && !this.token) {
             // code 存在  通过code获取token
             await getToken({ code }).then((res) => {
@@ -147,8 +174,6 @@ export default {
                     this.setToken(token)
                     this.getUserInfoFn()
                     typeof (fn) === 'function' && fn();
-                }else{
-                    this.$message('登录失败，请重新登录');
                 }
 
                 /* eslint-enable */
@@ -202,56 +227,60 @@ export default {
           this.$emit(eventname, data);
         },
 
-
+        initWxShareFn() {
+          /*eslint-disable*/
+          // 微信分享
+          this.wxShareTitle = this.$route.meta.wxShareTitle
+       || '优税学院';
+          this.wxShareDesc = this.$route.meta.wxShareDesc || '财税大神进阶之路，职业发展更快一步';
+          this.wxShareUrl = location.href.split('#')[0];
+          this.wxShareImage = `${window.location.origin + this.publicPath}sharelogo.png`;
+          this.wxShareFn();
+        },
         wxShareFn() {
           // 设置分享标题 图片 描述 地址
-
+          // alert("分享链接："+this.wxShareUrl)
+          let oThis = this;
+          let wxShareData = {
+            title: this.wxShareTitle, // 分享标题
+            link: this.wxShareUrl, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+            imgUrl:this.wxShareImage, // 分享图标
+            desc: this.wxShareDesc, // 分享描述
+            success: function (res) {
+              // 用户确认分享后执行的回调函数
+              // this.$message('分享成功');
+              oThis.$createDialog({
+                type: 'alert',
+                title: '提示',
+                content: '分享成功',
+                onConfirm: () => {
+                },
+              }).show();
+            },
+            cancel: function (res) {
+              // 用户取消分享后执行的回调函数
+              oThis.$createDialog({
+                type: 'alert',
+                title: '提示',
+                content: '取消分享',
+                onConfirm: () => {
+                },
+              }).show();
+            }
+          }
+          
+          // alert('当前location:::'+location.href.split('#')[0]+'第一次请求接口url:::'+params.url)
+          if(!getSystem().wx){
+            // 不是微信环境
+            return;
+          }
           wxShare().then((res) => {
             if (res.data && res.data.appId) {
-              wxConfig(res.data);
-              /*eslint-disable*/ 
-          window.wx && window.wx.ready(() => {
-            this.wxShareSucFn();
-          });
-          /* eslint-enable */
+              wxConfig(res.data, wxShareData);
             }
           }).catch((err) => {
             console.log(err);
           });
-        },
-        wxShareSucFn() {
-          /*eslint-disable*/ 
-      // 授权成功
-      //设置分享页
-      alert('wxShareTitle:::'+this.wxShareTitle+'===wxShareDesc:::'+this.wxShareDesc+'===wxShareUrl:::'+this.wxShareUrl+'===wxShareImage:::'+this.wxShareImage);
-      wx.onMenuShareTimeline({
-        title: this.wxShareTitle, // 分享标题
-        link: this.wxShareUrl, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-        imgUrl:this.wxShareImage, // 分享图标
-        success: function (res) {
-          // 用户确认分享后执行的回调函数
-          this.$message('分享成功');
-        },
-        cancel: function (res) {
-          // 用户取消分享后执行的回调函数
-        }
-      });
-      //分享给朋友
-      wx.onMenuShareAppMessage({
-        title: this.wxShareTitle, // 分享标题
-        link: this.wxShareUrl, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-        imgUrl: this.wxShareImage, // 分享图标
-        desc: this.wxShareDesc, // 分享描述
-        success: function (res) {
-          // 用户确认分享后执行的回调函数
-          this.$message('分享成功');
-        },
-        cancel: function (res) {
-          // 用户取消分享后执行的回调函数
-        }
-      });
-
-       /* eslint-enable */
         },
 
         ...mapMutations([
@@ -259,6 +288,7 @@ export default {
           'setCopData',
           'setNetWork',
           'setLoading',
+          'setFromRoute',
         ]),
         ...mapMutations('user', [
           'setUsers',

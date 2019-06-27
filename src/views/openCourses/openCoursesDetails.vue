@@ -1,5 +1,6 @@
 <template>
-    <div class="vipInfo_outer">
+    <div v-if="isShowPage" class="vipInfo_outer common-openCourses-openCoursesDetails">
+
         <!--banner start-->
         <div class="banner_outer">
             <img :src="detailData.pic" alt="">
@@ -8,8 +9,9 @@
         <!--title start-->
         <div class="title_outer">
             <div class="tit-left">
-                <span>{{ detailData.title }}</span>
-                <span class="red">￥{{ detailData.price }}</span>
+                <span class="title">{{ detailData.title }}</span>
+                <span v-if="detailData.price > 0" class="red">￥{{ detailData.price }}</span>
+                <span v-else class="green">免费</span>
             </div>
             <div class="tit-right">
                 <div class="collect_box" @click="collectFn">
@@ -25,15 +27,17 @@
         <!--title end-->
         <div class="link"></div>
         <!-- nav start -->
-        <div class="nav_outer">
+        <div v-if="detailData" class="nav_outer">
             <ul>
+
                 <li
-                        @click="tavsClick(index)"
+                        @click="tavsClick(v.id)"
                         v-for="(v,index) in vipTypeList"
                         :key="index"
-                        :class="{active:tabsActive==index}"
+                        :class="{active:tabsActive==v.id}"
+                        v-show="index==0 || detailData[v.key].length>1"
                 >
-                    <span>{{ v }}</span>
+                    <span>{{ v.name }}</span>
                     <div class="dbb-link"></div>
                 </li>
             </ul>
@@ -45,7 +49,7 @@
         <!-- 课程信息 end -->
 
         <!--footer start-->
-        <div class="footer_outer">
+        <div v-show="detailData.state === '0'" class="footer_outer">
             <div class="footer-left">
                 <div @click="onlineSignFn">
                     <i class="icon-user"></i>
@@ -76,7 +80,12 @@ export default {
   name: 'vipInfo',
   data() {
     return {
-      vipTypeList: ['课程信息', '课程介绍', '课程大纲', '课程计划'], // nav  tabs
+      vipTypeList: [
+        { name: '课程信息', id: 0, key: '' },
+        { name: '课程介绍', id: 1, key: 'introduce' },
+        { name: '课程大纲', id: 2, key: 'outline' },
+        { name: '课程计划', id: 3, key: 'plan' },
+      ], // nav  tabs
       tabsActive: 0,
       imgUrl: 'http://pic14.nipic.com/20110529/7570613_004640647181_2.jpg',
       courseId: '',
@@ -84,8 +93,9 @@ export default {
       isColl: '', // 是否收藏
       saveMyCollectionParam: { // 收藏参数
         courseId: '', // 课程id
-        onOffType: '1', // 线上线下0 : 线下课； 1 线上课
+        onOffType: '0', // 线上线下0 : 线下课； 1 线上课
       },
+      isShowPage: false,
     };
   },
   components: {
@@ -113,7 +123,7 @@ export default {
         this.confirmLogin();
         return;
       }
-      this.$router.push({ path: '/signup' });
+      this.$router.push({ path: `/signup?cid=${this.courseId}` });
     },
     // 收藏
     collectFn() {
@@ -122,12 +132,14 @@ export default {
       this.saveMyCollectionFn();
     },
     initWxShareFn() {
-      this.wxShareTitle = this.$route.meta.title;
-      // this.wxShareDesc = this.$route.meta.wxShareDesc || '默认描述信息';
-      this.wxShareDesc = this.detailData.title;
-      this.wxShareUrl = window.location.href;
-      this.wxShareImage = this.detailData.pic;
-      this.wxShareFn();
+      this.$nextTick(() => {
+        this.wxShareTitle = this.detailData.title;
+        // this.wxShareDesc = this.$route.meta.wxShareDesc || '默认描述信息';
+        this.wxShareDesc = (document.querySelector('#shareDesc') && document.querySelector('#shareDesc').innerText) || window.location.href;
+        this.wxShareUrl = window.location.href;
+        this.wxShareImage = this.detailData.pic;
+        this.wxShareFn();
+      });
     },
     saveMyCollectionFn() {
       // 收藏 如果未登录  提示去登陆
@@ -142,6 +154,8 @@ export default {
           this.isColl = !this.isColl;
           if (this.isColl) {
             this.toast('已收藏');
+          } else {
+            this.toast('已取消收藏');
           }
         } else {
           this.$message(res.data.message);
@@ -173,23 +187,28 @@ export default {
         },
         onConfirm: () => {
           // 点击确定
-          let a = document.createElement('a');
-          let href = 'tel:15114291511';
-          a.setAttribute('href', href);
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
+          // let a = document.createElement('a');
+          // let href = 'tel:15114291511';
+          // a.setAttribute('href', href);
+          // document.body.appendChild(a);
+          // a.click();
+          // a.remove();
+          this.collPhone();
         },
         onCancel: () => {
           // 点击取消
         },
       }).show();
     },
+    collPhone() {
+      window.location.href = 'tel:10086';
+    },
     init() {
       this.courseId = parseInt(this.$route.query.cid, 10);
       // 获取详情
       findOfflineCourseById({ id: this.courseId }).then((res) => {
         if (res.data.code === '0000' && res.data.data) {
+          this.isShowPage = true;
           this.isColl = res.data.isFavorite && res.data.isFavorite.code === '8888';
           this.detailData = res.data.data;
           // 自定义分享
@@ -202,7 +221,7 @@ export default {
     // 点击tabs
     tavsClick(index) {
       this.tabsActive = index;
-      this.$refs.child.aClick(index);
+      this.$refs.child.scrollToDom(index);
     },
   },
 };
@@ -237,7 +256,7 @@ export default {
         }
         .title_outer {
             width: 100%;
-            height: 75px;
+            min-height: 75px;
             padding: 10px 15px;
             display: flex;
             justify-content: space-between;
@@ -245,15 +264,30 @@ export default {
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
+                overflow: hidden;
+                flex: 1;
+                .title{
+                    line-height: 16px;
+                }
                 span {
                     font-size: 14px;
                     color: #444;
+                    /*white-space: nowrap;*/
+                    /*overflow: hidden;*/
+                    /*text-overflow: ellipsis;*/
+                    word-wrap: break-word;
+                    word-break: break-all;
+                    /*overflow: hidden;*/
                 }
                 .red {
                     color: #F91E1E;
                 }
+                .green {
+                    color: #2DAF53;
+                }
             }
             .tit-right {
+                width: 36px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -290,10 +324,14 @@ export default {
             background-color: #fff;
             border-bottom: 1px solid #d4d4d4;
             ul {
-                display: flex;
+                display: block;
+                overflow:hidden;
                 height: 100%;
+                display: flex;
+            align-items: center;
+            justify-content: space-around;
                 li {
-                    flex: 1;
+                    box-sizing:border-box;
                     height: 100%;
                     text-align: center;
                     line-height: 40px;

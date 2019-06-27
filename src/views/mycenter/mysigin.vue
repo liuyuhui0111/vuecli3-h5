@@ -21,7 +21,7 @@
         <div v-for="(item,index) in list" class="item"
         :key="index">
           <div class="tel">
-            2019-06-17 08:53 预约手机号：13354445555
+            {{item.signUp.substr(0,item.signUp.length-3)}} 预约手机号：{{item.phone}}
           </div>
           <ClassCard @cardClick="cardClick"
           :item="item" page="list">
@@ -30,21 +30,29 @@
             <div class="col-box">
               <span class="money"
               :class="{free:props.item.price==0}">
-              {{props.item.price==0?'免费':props.item.price}}</span>
-              <!-- <span class="col">取消收藏</span> -->
+              {{props.item.price==0?'免费':'￥'+props.item.price}}</span>
             </div>
           </template>
           </ClassCard>
 
           <div class="time">
-            上课时间：2019-12-12 12:00 ~2019-12-13 12:00
+            上课时间：
+            {{item.startTime.substr(0,item.startTime.length-3)}}
+            ~
+            {{item.endTime.substr(0,item.endTime.length-3)}}
           </div>
           <div class="address">
-            上课地点：北京市海淀区数码大厦A座9层
+            上课地点：{{item.address}}
           </div>
+          <div class="address">
+            听&ensp;课&ensp;码：{{item.tkm?item.tkm:'----'}}
+          </div>
+
         </div >
+
         </div>
         <template slot="pullup" slot-scope="props">
+        <div class="h80"></div>
         <div v-if="props.isPullUpLoad" class="tips">
           加载中...
         </div>
@@ -63,7 +71,7 @@
 </template>
 <script>
 import {
-  getCourseList,
+  queryMyApplication,
 } from '@/api/apis';
 import ClassCard from '@/views/components/card.vue';
 
@@ -91,14 +99,14 @@ export default {
       this.init();
     },
   },
-  mounted() {
+  created() {
     this.init();
   },
   computed: {
     options() {
       return {
         pullUpLoad: this.pullUpLoadObj,
-        scrollbar: true,
+        scrollbar: false,
       };
     },
     pullUpLoadObj() {
@@ -136,9 +144,6 @@ export default {
       if (t === 'init') {
         this.pageNum = 1;
         opt = {};
-        this.list = [];
-        this.isShowPage = false;
-        this.isShowBackTop = false;
       }
       if (this.list.length >= this.total && t !== 'init') {
         this.$refs.siginScroll.forceUpdate();
@@ -147,7 +152,7 @@ export default {
       let { pageNum } = this;
       let { pageSize } = this;
       // this.total = 0;
-      getCourseList({
+      queryMyApplication({
         pageNum,
         pageSize,
       }, opt).then((res) => {
@@ -156,19 +161,22 @@ export default {
           this.pageNum += 1;
           if (res.data.list.length > 0) {
             /*eslint-disable*/ 
-              res.data.list.forEach((item) => {
-                item.pic = item.bannerUrl;
-              });
+            res.data.list.forEach((item)=>{
+              item.type = "2";
+            })
              
-            this.list = this.list.concat(res.data.list);
+            
 
             if (this.list.length >= res.data.total && t !== 'init') {
               this.$refs.siginScroll.forceUpdate();
             }
 
             if (t === 'init') {
+              this.list = res.data.list;
               // 初始化情况下  更新srcoll 滚动到顶部
               this.$refs.siginScroll && this.$refs.siginScroll.refresh();
+            }else{
+              this.list = this.list.concat(res.data.list);
             }
           } else {
             this.$refs.siginScroll && this.$refs.siginScroll.forceUpdate();
@@ -187,6 +195,12 @@ export default {
 };
 </script>
 <style scoped>
+.h80{
+  height: 80px;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
 .tips{
   display: block;
   width: 100%;
@@ -194,12 +208,16 @@ export default {
   text-align: center;
   font-size: 12px;
   padding: 30px 0;
+  height: 20px;
+  line-height: 20px;
+  position: absolute;
+  bottom: 0;
 }
 .time,
 .address,
 .tel{
   font-size: 12px;
-  padding: 5px 0;
+  margin: 5px 0;
 }
 .time,
 .address{
@@ -213,6 +231,10 @@ export default {
 }
 .classtype2{
   color: #659FE3;
+}
+.col-box{
+  overflow: hidden;
+  padding-top: 45px;
 }
 .col-box .col{
   float: right;

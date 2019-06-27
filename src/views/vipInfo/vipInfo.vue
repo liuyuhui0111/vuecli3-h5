@@ -21,7 +21,7 @@
             <div class="title_outer">
                 <span>会员尊享特权</span>
                 <br>
-                <span class="red">￥{{ vipInfoData.fee }}</span>
+                <span v-show="lodingShow" class="red">￥{{ vipInfoData.fee }}</span>
             </div>
             <div class="coutent_info">
                 <div :key="index" v-for="(v,index) in vipInfoData.equityDtoList" class="list_outer">
@@ -30,7 +30,7 @@
                     <span>{{ v.name }}</span>
                 </div>
             </div>
-            <div class="btn_outer">
+            <div v-show="lodingShow" class="btn_outer">
                 <img @click="showBtn" src="./img/分组.png" alt>
                 <!-- <span>立即咨询</span> -->
             </div>
@@ -48,6 +48,7 @@ export default {
       vipTypeList: [], // nav  tabs
       tabsActive: 0,
       vipInfoData: {},
+      lodingShow: false,
     };
   },
   mounted() {
@@ -73,12 +74,7 @@ export default {
         },
         onConfirm: () => {
           // 点击确定
-          let a = document.createElement('a');
-          let href = 'tel:15114291511';
-          a.setAttribute('href', href);
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
+          window.location.href = 'tel:10086';
         },
         onCancel: () => {
           // 点击取消
@@ -88,8 +84,10 @@ export default {
     queryListFn() {
       // const that = this;
       // 查询会员权益列表
+      this.lodingShow = false;
       queryList().then((res) => {
         if (res.data.code === '0000') {
+          this.lodingShow = true;
           this.vipTypeList = res.data.list;
           if (res.data.list.length > 0) {
             /*eslint-disable*/

@@ -10,14 +10,6 @@ export default {
     return {
     };
   },
-  mounted() {
-    this.init();
-  },
-  methods: {
-    init() {
-
-    },
-  },
 };
 </script>
 <style scoped>

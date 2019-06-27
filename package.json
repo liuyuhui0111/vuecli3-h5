@@ -14,6 +14,7 @@
     "amfe-flexible": "^2.2.1",
     "axios": "^0.18.0",
     "cube-ui": "~1.12.15",
+    "fastclick": "^1.0.6",
     "nprogress": "^0.2.0",
     "vue": "^2.6.6",
     "vue-lazyload": "^1.2.6",

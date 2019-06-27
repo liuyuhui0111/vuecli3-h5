@@ -4,12 +4,16 @@ const routes = [{
   path: '/index',
   meta: {
     isHideQuickNav: true,
+    keepAlive: true,
   },
   view: () => import(/* webpackChunkName: "group-index" */ '@/views/index/index.vue'),
 }, {
   title: '会员介绍',
   name: 'vipInfo',
   path: '/vipInfo',
+  meta: {
+    keepAlive: true,
+  },
   view: () => import(/* webpackChunkName: "group-detail" */ '@/views/vipInfo/vipInfo.vue'),
 }, {
   title: '公开课详情',
@@ -24,7 +28,6 @@ const routes = [{
   name: 'lineOfCoursesDetails',
   path: '/lineOfCoursesDetails',
   meta: {
-    isHideQuickNav: true,
     isHideShare: true, // 隐藏全局通用分享，自定义分享内容
   },
   view: () => import(/* webpackChunkName: "group-detail" */ '@/views/lineOfCourses/lineOfCoursesDetails.vue'),
@@ -34,6 +37,8 @@ const routes = [{
   path: '/online',
   meta: {
     isHideQuickNav: true,
+    keepAlive: true,
+    wxShareTitle: '优税学院-全部课程',
   },
   view: () => import(/* webpackChunkName: "group-index" */ '@/views/allclass/online.vue'),
 }, {
@@ -42,6 +47,8 @@ const routes = [{
   path: '/offline',
   meta: {
     isHideQuickNav: true,
+    keepAlive: true,
+    wxShareTitle: '优税学院-全部课程',
   },
   view: () => import(/* webpackChunkName: "group-index" */ '@/views/allclass/offline.vue'),
 }, {
@@ -69,6 +76,7 @@ const routes = [{
   path: '/my',
   meta: {
     isHideQuickNav: true,
+    keepAlive: true,
   },
   view: () => import(/* webpackChunkName: "group-index" */ '@/views/mycenter/index.vue'),
 }, {

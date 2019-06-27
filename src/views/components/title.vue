@@ -28,14 +28,6 @@ export default {
       default: () => '',
     },
   },
-  mounted() {
-    this.init();
-  },
-  methods: {
-    init() {
-
-    },
-  },
 };
 </script>
 <style scoped>

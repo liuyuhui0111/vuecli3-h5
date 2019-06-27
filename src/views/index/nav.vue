@@ -28,14 +28,6 @@ export default {
       ],
     };
   },
-  mounted() {
-    this.init();
-  },
-  methods: {
-    init() {
-
-    },
-  },
 };
 </script>
 <style scoped>
@@ -52,12 +44,16 @@ export default {
     float: left;
     font-size: 14px;
   }
-  .item>span{
+  .item .icon-offline,
+  .item .icon-online{
     display: block;
     width: 55px;
     height: 55px;
     background: url('./imgs/icon-online.png') no-repeat center center;
     background-size: 55px 55px;
     margin: 15px auto 5px auto;
+  }
+  .item .icon-offline{
+    background-image: url('./imgs/icon-offline.png');
   }
 </style>

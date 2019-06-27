@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+</head>
+
+<body>
+    
+    <div onclick="initShare()">22222br <br> 222
+<br> 222<br> 222
+<br> 222<br> 222<br> 222<br> 222<br> 222
+</div>
+    <script>
+    //步骤一:创建异步对象
+    function initShare() {
+
+        alert(111)
+        var ajax = new XMLHttpRequest();
+        //步骤二:设置请求的url参数,参数一是请求的类型,参数二是请求的url,可以带参数,动态的传递参数starName到服务端
+        ajax.open('get', 'http://test.5ifapiao.com:8888/ele-myinvoice/wx/getJSSDK?url=' + window.location.href);
+        //步骤三:发送请求
+        ajax.send();
+        //步骤四:注册事件 onreadystatechange 状态改变就会调用
+        ajax.onreadystatechange = function() {
+            if (ajax.readyState == 4 && ajax.status == 200) {
+                //步骤五 如果能够进到这个判断 说明 数据 完美的回来了,并且请求的页面是存在的
+                　　　　
+                var data = JSON.parse(ajax.responseText);
+                console.log(data)
+                var opt = {
+                    debug: true,
+                    appId: data.appId,
+                    timestamp: data.timestamp,
+                    nonceStr: data.nonceStr,
+                    signature: data.signature,
+                    jsApiList: ["onMenuShareAppMessage", "onMenuShareTimeline"]
+                        // jsApiList: ["updateAppMessageShareData", "updateTimelineShareData","hideMenuItems"]
+                }
+                wx.config(opt);
+
+                wx.ready(() => {
+                    wx.onMenuShareTimeline({
+                        title: "11111", // 分享标题
+                        link: "http://test.5ifapiao.com:8888/mcourse/demo.html", // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                        imgUrl: "http://test.5ifapiao.com:8888/mcourse/sharelogo.png", // 分享图标
+                        success: function() {
+                            alert("111");
+                        },
+                        cancel: function() {
+                            alert("222");
+                        }
+                    });
+
+                    wx.onMenuShareAppMessage({
+                        title: "11111", // 分享标题
+                        link: 'http://test.5ifapiao.com:8888/mcourse/demo.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                        desc: '22222222222222222',
+                        imgUrl: 'http://test.5ifapiao.com:8888/mcourse/sharelogo.png', // 分享图标
+                        success: function() {
+                            alert("111");
+                        },
+                        cancel: function() {
+                            alert("222");
+                        }
+                    });
+
+                });
+
+                wx.error((res) => {
+                    console.log(res);
+                    alert("微信error执行报错信息：" + JSON.stringify(res))
+                });　　
+            }
+        }
+    }
+
+    window.onload = function() {
+        initShare();
+    }
+    </script>
+</body>
+
+</html>

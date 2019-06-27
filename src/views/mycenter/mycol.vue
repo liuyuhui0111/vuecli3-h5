@@ -1,7 +1,6 @@
 <template>
   <div class="learnlist">
 
-
     <div class="empty" v-show="list.length<1 && isShowPage">
       <span class="icon-empty"></span>
       <p @click="routerReplace('/online')">还没收藏记录哦~ <br>
@@ -31,10 +30,10 @@
             </template>
             <template slot-scope="props"
             slot="onlineIntro">
-              <div class="col-box">
+              <div class="col-box" :class="{mtop:props.item.type==2}">
                 <span class="money"
                 :class="{free:props.item.price==0}">
-                {{props.item.price==0?'免费':props.item.price}}</span>
+                {{props.item.price==0?'免费':'￥'+props.item.price}}</span>
                 <span @click.stop="saveMyCollectionFn(props.item)" class="col">取消收藏</span>
               </div>
             </template>
@@ -42,6 +41,7 @@
           </div >
 
         </div>
+        <div class="h80"></div>
         <template slot="pullup" slot-scope="props">
           <div v-if="props.isPullUpLoad" class="tips">
             加载中...
@@ -61,7 +61,7 @@
 </template>
 <script>
 import {
-  queryMycollectionList,
+  queryCollectionClass,
   saveMyCollection,
 } from '@/api/apis';
 import ClassCard from '@/views/components/card.vue';
@@ -85,10 +85,6 @@ export default {
         courseId: '', // 课程id
         onOffType: '', // 线上线下0 : 线下课； 1 线上课
       },
-      params: { // 我的收藏列表
-        onOffType: '1', // 线上线下标识0 : 线下课； 1 线上课
-        type: '1', // 线上课必填：课程类型 1 精品课 2专题课
-      },
     };
   },
   components: {
@@ -99,7 +95,7 @@ export default {
       this.init();
     },
   },
-  mounted() {
+  created() {
     this.init();
   },
   computed: {
@@ -145,9 +141,6 @@ export default {
       if (t === 'init') {
         this.pageNum = 1;
         opt = {};
-        this.list = [];
-        this.isShowPage = false;
-        this.isShowBackTop = false;
       }
       if (this.list.length >= this.total && t !== 'init') {
         this.$refs.colScroll.forceUpdate();
@@ -156,10 +149,9 @@ export default {
       let { pageNum } = this;
       let { pageSize } = this;
       // this.total = 0;
-      queryMycollectionList({
+      queryCollectionClass({
         pageNum,
         pageSize,
-        ...this.params,
       }, opt).then((res) => {
         if (res.data.code === '0000') {
           this.isShowPage = true;
@@ -167,18 +159,27 @@ export default {
           if (res.data.list.length > 0) {
             /*eslint-disable*/ 
               res.data.list.forEach((item) => {
-                item.pic = item.bannerUrl;
+                item.pic = item.picture;
+                item.id = item.courseId;
+                item.title = item.className;
+                item.price = item.classPrice;
+                if(item.onOffType === "1"){
+                  // 线上课
+                  item.type = "1"
+                }else{
+                  // 线下课
+                  item.type = "2"
+                }
               });
-             
-            this.list = this.list.concat(res.data.list);
+             if(t==='init'){
+              this.list = res.data.list
+            }else{
+              this.list = this.list.concat(res.data.list);
+            }
+            
 
             if (this.list.length >= res.data.total && t !== 'init') {
               this.$refs.colScroll.forceUpdate();
-            }
-
-            if (t === 'init') {
-              // 初始化情况下  更新srcoll 滚动到顶部
-              // this.$refs.colScroll && this.$refs.colScroll.refresh();
             }
           } else {
             this.$refs.colScroll && this.$refs.colScroll.forceUpdate();
@@ -188,25 +189,25 @@ export default {
         }
       }).catch((err) => {
         console.log(err);
-        this.$message('线上课列表获取失败，请稍后再试');
+        this.$message('我的收藏列表获取失败，请稍后再试');
       });
     },
 
     saveMyCollectionFn(item) {
       // 收藏 如果未登录  提示去登陆
-      console.log(item);
       if (this.isCanRequest) {
         this.isCanRequest = false;
       } else {
         return;
       }
       this.saveMyCollectionParam.courseId = item.id;
-      this.saveMyCollectionParam.onOffType = item.type;
+      this.saveMyCollectionParam.onOffType = item.type === '2' ? 0 : 1;
 
       saveMyCollection(this.saveMyCollectionParam).then((res) => {
         this.isCanRequest = true;
         if (res.data.code === '0000') {
-          this.init();
+          // this.init();
+          this.cancelSucFn(this.saveMyCollectionParam.courseId);
           this.$message('已取消收藏');
         } else if (res.data.code !== '0002') {
           this.$message('取消失败，请重新操作');
@@ -217,12 +218,30 @@ export default {
         this.$message('取消失败，请重新操作');
       });
     },
+    cancelSucFn(cid) {
+      let i = -1;
+      this.list.forEach((item, index) => {
+        if (item.id === cid) {
+          i = index;
+        }
+      });
+      if (i !== -1) {
+        this.list.splice(i, 1);
+      }
+      this.onPullingUp('init');
+    },
 
 
   },
 };
 </script>
 <style scoped>
+.h80{
+  height: 80px;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
 .tips{
   display: block;
   width: 100%;
@@ -230,6 +249,10 @@ export default {
   text-align: center;
   font-size: 12px;
   padding: 30px 0;
+  height: 20px;
+  line-height: 20px;
+  position: absolute;
+  bottom: 0;
 }
 
 .classtype2,
@@ -241,8 +264,15 @@ export default {
 .classtype2{
   color: #659FE3;
 }
+.col-box.mtop{
+  overflow: hidden;
+  padding-top: 45px;
+
+}
 .col-box .col{
   float: right;
+  margin: -50px;
+  padding: 50px;
 }
 .money{
   color: #F91E1E;
@@ -289,6 +319,7 @@ export default {
     display: block;
     width: 100%;
     box-sizing:border-box;
+
   }
   .list .item{
     width: 100%;
