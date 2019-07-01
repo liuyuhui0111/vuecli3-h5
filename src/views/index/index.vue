@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showList.length>4" class="index">
+  <div v-if="showList.length>0" class="index">
     <cube-scroll ref="indexScroll"
     :data="showList"
     :scrollEvents="['scroll']"
@@ -164,9 +164,9 @@ export default {
 
     moreclick(moreurl) {
       // 查看更多
-      let moreData = [{ path: '/offline' },
-        { path: '/online', query: { hot: 1 } },
-        { path: '/online' },
+      let moreData = [{ path: '/open-class' },
+        { path: '/online-class', query: { hot: 1 } },
+        { path: '/online-class' },
       ];
       this.routerGo(moreData[moreurl].path, moreData[moreurl].query);
     },

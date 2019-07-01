@@ -22,15 +22,15 @@ export default {
           index: 0,
         }, {
           text: '全部课程',
-          path: '/offline',
+          path: '/open-class',
           index: 1,
         }, {
           text: '最近在学',
-          path: '/learnlist',
+          path: '/center/myclass',
           index: 2,
         }, {
           text: '我的',
-          path: '/my',
+          path: '/center',
           index: 3,
         },
       ],
@@ -52,8 +52,8 @@ export default {
       this.curindex = -1;
       // 判断是否显示底部导航
       let { path } = this.$route;
-      if (path === '/online') {
-        path = '/offline';
+      if (path === '/online-class') {
+        path = '/open-class';
       }
       this.list.forEach((item, index) => {
         if (item.path === path) {

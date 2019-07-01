@@ -15,7 +15,7 @@
       <div class="empty" v-if="list.length<1 && isShowPage">
         <span class="icon-empty"></span>
         <template>
-          <p @click="routerReplace('/online')">暂无线上公开课~ <br>
+          <p @click="routerReplace('/online-class')">暂无线上公开课~ <br>
             <span class="active">先去学习一下线上课程吧！</span></p>
         </template>
       </div>
@@ -72,12 +72,12 @@ export default {
         {
           text: '线下公开课',
           type: '2',
-          path: '/offline',
+          path: '/open-class',
         },
         {
           text: '线上录播课',
           type: '1',
-          path: '/online',
+          path: '/online-class',
         },
       ],
       list: [], // 课程列表  公开课 线上课共用

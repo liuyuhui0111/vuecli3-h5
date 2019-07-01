@@ -18,12 +18,12 @@ export default {
         {
           icon: 'icon-online',
           title: '在线课程',
-          path: '/online',
+          path: '/online-class',
         },
         {
           icon: 'icon-offline',
           title: '财税公开课',
-          path: '/offline',
+          path: '/open-class',
         },
       ],
     };

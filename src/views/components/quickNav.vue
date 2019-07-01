@@ -26,11 +26,11 @@ export default {
         }, {
           icon: 'icon-all',
           tit: '全部课程',
-          path: '/offline',
+          path: '/open-class',
         }, {
           icon: 'icon-me',
           tit: '我的',
-          path: '/my',
+          path: '/center',
         },
       ],
     };

@@ -40,6 +40,7 @@
 </template>
 <script>
 import { queryList } from '@/api/apis';
+import { getSystem } from '@/assets/utils/util';
 
 export default {
   name: 'vipInfo',
@@ -56,6 +57,10 @@ export default {
   },
   methods: {
     showBtn() {
+      if (getSystem().ios) {
+        window.location.href = `tel:${this.COMMON_COMP_DATA.phone}`;
+        return;
+      }
       this.$createDialog({
         type: 'confirm',
         title: '提示',
@@ -74,7 +79,7 @@ export default {
         },
         onConfirm: () => {
           // 点击确定
-          window.location.href = 'tel:10086';
+          window.location.href = `tel:${this.COMMON_COMP_DATA.phone}`;
         },
         onCancel: () => {
           // 点击取消

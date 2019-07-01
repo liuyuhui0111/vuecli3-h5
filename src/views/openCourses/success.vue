@@ -38,7 +38,7 @@ letter-spacing: -0.68px;
 }
 .icon-success{
   display: block;
-  width: 150px;
+  width: 160px;
   padding-left: 50px;
   background: url('./img/icon-success.png') no-repeat left center;
   background-size: 40px 40px;

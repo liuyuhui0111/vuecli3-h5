@@ -22,11 +22,11 @@
       <div class="empty" v-show="list.length<1 && isShowPage">
         <span class="icon-empty"></span>
         <template v-if="allCount>0">
-          <p @click="routerReplace('/offline')">没有搜索到相关课程~ <br>
+          <p>没有搜索到相关课程~ <br>
           <span class="active">换个条件试试吧！</span></p>
         </template>
         <template v-else>
-          <p @click="routerReplace('/offline')">暂无线上课程~ <br>
+          <p @click="routerReplace('/open-class')">暂无线上课程~ <br>
           <span class="active">先去学习一下公开课吧！</span></p>
         </template>
       </div>
@@ -83,12 +83,12 @@ export default {
         {
           text: '线下公开课',
           type: '2',
-          path: '/offline',
+          path: '/open-class',
         },
         {
           text: '线上录播课',
           type: '1',
-          path: '/online',
+          path: '/online-class',
         },
       ],
       list: [], // 课程列表  公开课 线上课共用
@@ -157,11 +157,30 @@ export default {
     },
   },
   activated() {
-    this.$nextTick(() => {
-      /*eslint-disable*/ 
-      this.$refs.onlinescroll && this.$refs.onlinescroll.refresh();
-      /* eslint-enable */
-    });
+    // 首页跳转最新最热  更新数据
+    this.params.boolean = parseInt(this.$route.query.hot, 10) || 0;
+    if (this.params.boolean !== this.listData[3].value) {
+      if (this.params.boolean === 0) {
+        this.$set(this.listData, 3, {
+          text: '最新', //
+          value: 0,
+          active: false,
+        });
+      } else {
+        this.$set(this.listData, 3, {
+          text: '最热', //
+          value: 1,
+          active: false,
+        });
+      }
+      this.onPullingUp('init');
+    } else {
+      this.$nextTick(() => {
+        /*eslint-disable*/ 
+        this.$refs.onlinescroll && this.$refs.onlinescroll.refresh();
+        /* eslint-enable */
+      });
+    }
   },
 
   mounted() {
@@ -174,7 +193,7 @@ export default {
       this.list = [];
       // this.$refs.cubelist.reset();
       this.params.categoryId = this.$route.query.nid || ''; // 方向专业id
-      this.params.boolean = this.$route.query.hot || 0; // 热度  0最新 1最热
+      this.params.boolean = parseInt(this.$route.query.hot, 10) || 0; // 热度  0最新 1最热
       // 获取在线课程导航
       this.getCategoryListFn();
       this.onPullingUp('init');
@@ -190,7 +209,8 @@ export default {
       this.$refs.onlinescroll.scrollTo(0, 0);
       this.isShowBackTop = false;
     },
-    initListData(list) {
+    initListData(navlist) {
+      let list = navlist || this.onlineNavList;
       // 初始化导航状态
       if (this.params.boolean === 1) {
         this.listData[3].text = '最热';
@@ -292,8 +312,8 @@ export default {
       this.onlineNavList = [];
       getCategoryList().then((res) => {
         if (res.data.code === '0000') {
-          this.initListData(res.data.list);
           this.onlineNavList = res.data.list;
+          this.initListData(res.data.list);
         }
       }).catch((err) => {
         console.log(err);

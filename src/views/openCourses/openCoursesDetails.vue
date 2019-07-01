@@ -1,6 +1,5 @@
 <template>
     <div v-if="isShowPage" class="vipInfo_outer common-openCourses-openCoursesDetails">
-
         <!--banner start-->
         <div class="banner_outer">
             <img :src="detailData.pic" alt="">
@@ -74,6 +73,7 @@
 //     saveMyCollection,
 import courseInfo from '@/views/components/courseInfo.vue';
 import { findOfflineCourseById, saveMyCollection } from '@/api/apis';
+import { getSystem } from '@/assets/utils/util';
 
 
 export default {
@@ -167,10 +167,14 @@ export default {
     },
     // 跳转会员介绍
     goVip() {
-      this.$router.push({ path: '/vipInfo' });
+      this.$router.push({ path: '/interests' });
     },
     // 拨打电话弹框
     showBtn() {
+      if (getSystem().ios) {
+        window.location.href = `tel:${this.COMMON_COMP_DATA.phone}`;
+        return;
+      }
       this.$createDialog({
         type: 'confirm',
         title: '提示',
@@ -201,7 +205,7 @@ export default {
       }).show();
     },
     collPhone() {
-      window.location.href = 'tel:10086';
+      window.location.href = `tel:${this.COMMON_COMP_DATA.phone}`;
     },
     init() {
       this.courseId = parseInt(this.$route.query.cid, 10);
@@ -287,7 +291,7 @@ export default {
                 }
             }
             .tit-right {
-                width: 36px;
+                width: 38px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;

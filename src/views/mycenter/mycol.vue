@@ -3,7 +3,7 @@
 
     <div class="empty" v-show="list.length<1 && isShowPage">
       <span class="icon-empty"></span>
-      <p @click="routerReplace('/online')">还没收藏记录哦~ <br>
+      <p @click="routerReplace('/online-class')">还没收藏记录哦~ <br>
       <span class="active">现在去收藏</span></p>
     </div>
     <div v-if="list.length>0" class="view-wrapper">

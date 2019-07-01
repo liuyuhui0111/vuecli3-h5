@@ -29,7 +29,7 @@
             <span>培训地点: {{ detailData.address }}{{ detailData.city }}{{ detailData.county }}</span>
             <span>咨询电话: {{ detailData.hotline }}</span>
         </div>
-        <template v-if="detailData.introduce || detailData.teacherBrief">
+        <template v-if="detailData.introduce || detailData. courseBrief">
         <!-- 课程介绍 -->
         <div id="content1" class="tit_outer">
             <div class="tit_content">
@@ -38,10 +38,7 @@
             </div>
         </div>
         <div id="shareDesc" class="introduce_outer">
-            <span
-                    style="line-height: 20px"
-                    v-html="detailData.introduce || detailData.teacherBrief">
-
+            <span v-html="detailData.introduce || detailData. courseBrief">
             </span>
         </div>
     </template>
@@ -55,7 +52,6 @@
         </div>
         <div v-if="!detailData.teacherIntroduction" class="introduce_outer">
             <span
-                    style="line-height: 20px"
                     v-html="detailData.outline || detailData.courseIncome">
 
             </span>
@@ -72,9 +68,7 @@
             </div>
             <div class="introduce_outer">
                 <span
-                        style="line-height: 20px"
                         v-html="detailData.outline || detailData.courseOutline">
-
                 </span>
             </div>
         </template>
@@ -87,7 +81,7 @@
             </div>
         </div>
         <div v-if="detailData.teacherIntroduction" class="introduce_outer">
-            <span style="line-height: 20px" v-html="detailData.plan"></span>
+            <span v-html="detailData.plan"></span>
         </div>
         </template>
 
@@ -229,6 +223,7 @@ export default {
             width: 100%;
             padding: 10px 15px;
             span {
+                line-height: 1.5;
                 font-size: 14px;
                 color: #444;
                 p {

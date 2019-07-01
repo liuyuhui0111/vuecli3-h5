@@ -4,7 +4,7 @@
 
     <div class="empty" v-show="list.length<1 && isShowPage">
       <span class="icon-empty"></span>
-      <p @click="routerReplace('/offline')">还没有报名公开课哦~ <br>
+      <p @click="routerReplace('/open-class')">还没有报名公开课哦~ <br>
       <span class="active">现在去报名</span></p>
     </div>
     <div v-if="list.length>0" class="view-wrapper">

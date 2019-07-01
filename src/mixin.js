@@ -144,9 +144,9 @@ export default {
           // 点击跳转详情
           /*eslint-disable*/
           if(item.type == '2'){
-            this.routerGo('/openCoursesDetails',{cid:item.id});
+            this.routerGo('/detail',{cid:item.id});
           }else if(item.type == '1'){
-            this.routerGo('/lineOfCoursesDetails',{cid:item.id});
+            this.routerGo('/online-detail',{cid:item.id});
           }
           /* eslint-enable */
         },

@@ -1,5 +1,7 @@
 /* eslint-disable */
-
+// 路由尽量与PC端保持一致  没有的新建 PC端有的要保持一致
+// 路由尽量与PC端保持一致  没有的新建 PC端有的要保持一致
+// 路由尽量与PC端保持一致  没有的新建 PC端有的要保持一致
 import Vue from 'vue'
 import Router from 'vue-router'
 import NProgress from 'nprogress'
@@ -93,13 +95,15 @@ router.beforeEach((to, from, next) => {
     }
     
   }else{
-    document.title = to.meta.title || '加载中...'
     NProgress.start();
     next();
   }
 })
 
 router.afterEach((to, from) => {
+  if(document.title != to.meta.title){
+    document.title = to.meta.title || ''
+  }
   NProgress.done();
 })
 

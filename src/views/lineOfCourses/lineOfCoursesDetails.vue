@@ -149,7 +149,7 @@
                                     :class="v.icon">
                             </i>
                             <i
-                                    v-show="curIndex === index && !isShowIframe && isShowIframeImg"
+                                    v-show="curIndex === index && !isShowIframe"
                                     :class="{
                                         'icon-suoding1':(
                                             footerBtnShow
@@ -194,7 +194,7 @@
         <div v-else class="err_outer">
             <i class="icon-out"></i>
             <span>您查看的课程已下架,</span>
-            <span>您可以返回上页浏览其它页面</span>
+            <span>您可以返回首页浏览其它页面</span>
             <span @click="routerBack" class="back-btn">返回首页</span>
         </div>
     </div>
@@ -687,7 +687,7 @@ export default {
             },
             // 跳转会员介绍
             goVip() {
-                this.$router.push({path: '/vipInfo'});
+                this.$router.push({path: '/interests'});
             },
             routerBack() {
                 this.$router.push({path: '/index'});
@@ -774,7 +774,7 @@ export default {
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
-                    margin-top: 28px;
+                    margin-top: 25px;
                     span {
                         color: #fff;
                         font-size: 14px;
@@ -786,7 +786,7 @@ export default {
                     }
                 }
                 .btns {
-                    margin-top: 35px;
+                    margin-top: 20px;
                     span {
                         font-size: 14px;
                         width: 126px;

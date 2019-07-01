@@ -7,13 +7,13 @@
       <div v-if="token && commonUserData" class="user">
         <span class="username ellipsis">{{commonUserData.userName}}</span>
         <span class="level"
-        @click="routerGo('/vipInfo')"
+        @click="routerGo('/interests')"
         v-if="(commonUserData.leaguerList &&
         commonUserData.leaguerList.effective==0)">
           您的会员已到期，去续费
         </span>
         <span class="level"
-        @click="routerGo('/vipInfo')"
+        @click="routerGo('/interests')"
         v-else-if="!commonUserData.leaguerLevelName">您尚未开通会员，去开通</span>
         <span class="level" v-else>{{commonUserData.leaguerLevelName}}</span>
       </div>
@@ -49,11 +49,11 @@ export default {
         {
           iconClass: 'icon-sigin',
           text: '我的预约报名',
-          path: '/mysigin',
+          path: '/center/signin',
         }, {
           iconClass: 'icon-col',
           text: '我的收藏',
-          path: '/mycol',
+          path: '/center/mycol',
         },
       ],
     };
