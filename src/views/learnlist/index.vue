@@ -12,8 +12,8 @@
           ref="learnlistScroll"
           :data="list"
           :options="options"
-          :scrollEvents="['scroll']"
-          @scroll="scroll"
+          :scrollEvents="['scroll-end']"
+          @scroll-end="scroll"
           @pulling-up="onPullingUp">
         <!-- 上拉加载 -->
         <!-- 展示区域 -->
@@ -71,7 +71,7 @@ export default {
       pageSize: 10, // 每页条数
       total: 0, // 总条数
       pullUpLoad: true,
-      pullUpLoadThreshold: 0,
+      pullUpLoadThreshold: 100,
       pullUpLoadMoreTxt: '上拉加载',
       pullUpLoadNoMoreTxt: '已经到底了~',
       isShowBackTop: false, // 返回顶部
@@ -126,7 +126,7 @@ export default {
       }
     },
     scrollToTop() {
-      this.$refs.learnlistScroll.scrollTo(0, 0);
+      this.$refs.learnlistScroll.scrollTo(0, 0, 300);
       this.isShowBackTop = false;
     },
     onPullingUp(t) {
@@ -177,7 +177,7 @@ export default {
         }
       }).catch((err) => {
         console.log(err);
-        this.$message('最近学习列表获取失败，请稍后再试');
+        // this.$message('最近学习列表获取失败，请稍后再试');
       });
     },
 

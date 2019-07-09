@@ -135,7 +135,9 @@ export default {
       this.$nextTick(() => {
         this.wxShareTitle = this.detailData.title;
         // this.wxShareDesc = this.$route.meta.wxShareDesc || '默认描述信息';
-        this.wxShareDesc = (document.querySelector('#shareDesc') && document.querySelector('#shareDesc').innerText) || window.location.href;
+        this.wxShareDesc = (document.querySelector('#shareDesc')
+            && document.querySelector('#shareDesc').innerText)
+            || window.location.href;
         this.wxShareUrl = window.location.href;
         this.wxShareImage = this.detailData.pic;
         this.wxShareFn();
@@ -151,18 +153,18 @@ export default {
 
       saveMyCollection(this.saveMyCollectionParam).then((res) => {
         if (res.data.code === '0000') {
-          this.isColl = !this.isColl;
-          if (this.isColl) {
-            this.toast('已收藏');
+          if (res.data.type === '0') {
+            this.isColl = false;
+            this.$message('已取消收藏');
           } else {
-            this.toast('已取消收藏');
+            this.isColl = true;
+            this.$message('已收藏');
           }
         } else {
           this.$message(res.data.message);
         }
       }).catch((err) => {
         console.log(err);
-        this.$message('服务器错误，请稍后再试');
       });
     },
     // 跳转会员介绍

@@ -37,7 +37,11 @@
           <template v-if="item.type == '2'">
             <slot name="onlineIntro" :item="item">
             <div class="teacher ellipsis">
-              <span>主讲：{{item.teacherName}}</span>
+              <span v-if="item.teacherName">主讲：{{
+              (item.teacherName && item.teacherName.length>3)
+                ? item.teacherName.substr(0,3)+'...'
+                : item.teacherName
+              }}</span>
               <span class="address">
                 {{item.address + item.city}}
               </span>

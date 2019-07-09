@@ -35,7 +35,7 @@ export default {
     },
     initScroll() {
       // 监听滚动条事件 判断当前滚动条位置
-      this.innerHeight = window.innerHeight * 2;
+      this.innerHeight = window.innerHeight;
       const oThis = this;
       this.scrollTop = getScrollTop();
       window.addEventListener('scroll', () => {

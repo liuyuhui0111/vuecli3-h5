@@ -35,8 +35,8 @@
             ref="onlinescroll"
             :data="list"
             :options="options"
-            :scrollEvents="['scroll']"
-            @scroll="scroll"
+            :scrollEvents="['scroll-end']"
+            @scroll-end="scroll"
             @pulling-up="onPullingUp">
           <!-- 上拉加载 -->
           <!-- 展示区域 -->
@@ -107,7 +107,7 @@ export default {
         learnType: '', // 类型全部'' 1 思维建立  2技能精进 3优秀实践
       },
       pullUpLoad: true,
-      pullUpLoadThreshold: 0,
+      pullUpLoadThreshold: 100,
       pullUpLoadMoreTxt: '上拉加载',
       pullUpLoadNoMoreTxt: '已经到底了~',
       customPullDown: false,
@@ -206,7 +206,7 @@ export default {
       }
     },
     scrollToTop() {
-      this.$refs.onlinescroll.scrollTo(0, 0);
+      this.$refs.onlinescroll.scrollTo(0, 0, 300, 'ease-in');
       this.isShowBackTop = false;
     },
     initListData(navlist) {
@@ -304,7 +304,7 @@ export default {
         }
       }).catch((err) => {
         console.log(err);
-        this.$message('线上课列表获取失败，请稍后再试');
+        // this.$message('线上课列表获取失败，请稍后再试');
       });
     },
     getCategoryListFn() {
@@ -317,7 +317,7 @@ export default {
         }
       }).catch((err) => {
         console.log(err);
-        this.$message('获取线上课程导航列表失败,请稍后再试');
+        // this.$message('获取线上课程导航列表失败,请稍后再试');
       });
     },
 

@@ -33,7 +33,6 @@ export function wxConfig(data,shareData){
 
 export function shareStart(shareData){
   // 分享到朋友圈
-  shareData.link = initWxShareUrl(shareData.link);
   shareData.link = replaceCode(shareData.link);
   wx.onMenuShareTimeline({
     title: shareData.title, // 分享标题
@@ -44,7 +43,7 @@ export function shareStart(shareData){
   });
   // wx.updateAppMessageShareData({
   //   title: shareData.title, // 分享标题
-  //   link: initWxShareUrl(shareData.link), // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+  //   link: shareData.link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
   //   imgUrl:shareData.imgUrl, // 分享图标
   //   success: shareData.success,
   //   cancel: shareData.cancel
@@ -71,21 +70,4 @@ export function hideShare(){
     ] // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
   });
 }
-export function initWxShareUrl(url){
-  // 删除链接里微信自动拼接的from isappinstalled sharer_username scene clicktime
-  const delFromReg = /from\=\w*(&|$)/;
-  const delsharer_username = /sharer_username\=\w*(&|$)/;
-  const delscene = /scene\=\w*(&|$)/;
-  const delclicktime = /clicktime\=\w*(&|$)/;
-  const delIsappinstalledReg = /isappinstalled\=\w*(&|$)/;
-  let href = url.replace(delFromReg,'')
-            .replace(delIsappinstalledReg,'')
-            .replace(delsharer_username,'')
-            .replace(delscene,'')
-            .replace(delclicktime,'');
-  if (href.substr(href.length - 1, 1) === '?' || href.substr(href.length - 1, 1) === '&') {
-    // 如果最后一个字符是？
-    href = href.substring(0, href.length - 1);
-  }
-  return href;
-}
+

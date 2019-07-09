@@ -5,7 +5,11 @@
     :class="{active:listIndex == index}"
     @click="changeNav(index)"
     :key="index">
-      <span>{{item.text}}</span>
+      <span>{{
+      (item.text && item.text.length>5)
+                ? item.text.substr(0,4)+'...'
+                : item.text
+      }}</span>
     </div>
     <div v-show="listIndex==0" class="show-box">
     <!-- 方向专业 -->

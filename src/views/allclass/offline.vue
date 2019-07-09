@@ -24,8 +24,8 @@
             ref="scroll"
             :data="list"
             :options="options"
-            :scrollEvents="['scroll']"
-            @scroll="scroll"
+            :scrollEvents="['scroll-end']"
+            @scroll-end="scroll"
             @pulling-up="onPullingUp">
           <!-- 上拉加载 -->
           <!-- 展示区域 -->
@@ -86,7 +86,7 @@ export default {
       total: 0, // 总条数
       isShowPage: false, // 是否展示页面
       pullUpLoad: true,
-      pullUpLoadThreshold: 0,
+      pullUpLoadThreshold: 100,
       pullUpLoadMoreTxt: '上拉加载',
       pullUpLoadNoMoreTxt: '已经到底了~',
       customPullDown: false,
@@ -138,7 +138,7 @@ export default {
       }
     },
     scrollToTop() {
-      this.$refs.scroll.scrollTo(0, 0);
+      this.$refs.scroll.scrollTo(0, 0, 300, 'ease-in');
       this.isShowBackTop = false;
     },
     onPullingUp(t) {

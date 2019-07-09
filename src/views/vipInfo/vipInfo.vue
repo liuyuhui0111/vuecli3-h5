@@ -1,5 +1,9 @@
 <template>
-    <div class="vipInfo_outer">
+    <div class="empty" v-if="vipTypeList.length<1 && isShowPage">
+      会员信息获取失败，请稍后再试
+    </div>
+
+    <div v-else class="vipInfo_outer">
         <!-- nav start -->
         <div class="nav_outer">
             <ul>
@@ -50,9 +54,12 @@ export default {
       tabsActive: 0,
       vipInfoData: {},
       lodingShow: false,
+      isShowPage: false,
+
     };
   },
   mounted() {
+    this.isShowPage = false;
     this.queryListFn();
   },
   methods: {
@@ -91,6 +98,7 @@ export default {
       // 查询会员权益列表
       this.lodingShow = false;
       queryList().then((res) => {
+        this.isShowPage = true;
         if (res.data.code === '0000') {
           this.lodingShow = true;
           this.vipTypeList = res.data.list;
@@ -101,6 +109,7 @@ export default {
           }
         }
       }).catch((err) => {
+        this.isShowPage = true;
         console.log(err);
       });
     },
@@ -113,6 +122,11 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+    .empty{
+      font-size:16px;
+      padding:60px 0;
+      text-align: center;
+    }
     .vipInfo_outer {
         width: 100%;
         height: 100%;

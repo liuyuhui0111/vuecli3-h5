@@ -2,8 +2,8 @@
   <div v-if="showList.length>0" class="index">
     <cube-scroll ref="indexScroll"
     :data="showList"
-    :scrollEvents="['scroll']"
-    @scroll="scroll">
+    :scrollEvents="['scroll-end']"
+    @scroll-end="scroll">
     <!-- logo -->
     <div @click="initWxShareFn()" class="logo">
       <baseImg
@@ -37,7 +37,7 @@
 
 
       <!-- 大家都在学 -->
-      <div v-if="showCourseOnlineList.length>0" class="card">
+      <div v-if="showCourseOnlineList.length>1" class="card">
         <BaseTitle title="大家都在学"
         @moreclick="moreclick"
         moreurl="1"></BaseTitle>
@@ -100,7 +100,6 @@ import {
   getNewCourseList,
   getGroomCourseList,
 } from '@/api/apis';
-import { initList } from '@/assets/utils/util';
 import Banner from './banner.vue';
 import IndexNav from './nav.vue';
 import BaseTitle from '@/views/components/title.vue';
@@ -158,7 +157,7 @@ export default {
       }
     },
     scrollToTop() {
-      this.$refs.indexScroll.scrollTo(0, 0);
+      this.$refs.indexScroll.scrollTo(0, 0, 300);
       this.isShowBackTop = false;
     },
 
@@ -217,8 +216,10 @@ export default {
           res.data.list.forEach((item)=>{
               item.pic = item.bannerUrl;
           })
+          let list = res.data.list;
+          let num = parseInt(list.length/2,10)*2>6 ? 6 : parseInt(list.length/2,10)*2;
           /* eslint-enable */
-          this.showCourseOnlineList = initList(res.data.list, 2).slice(0, 6);
+          this.showCourseOnlineList = list.slice(0, num);
         }
       }).catch((err) => {
         this.showList.push(true);
@@ -256,7 +257,7 @@ export default {
               item.pic = item.bannerUrl;
           });
           /* eslint-enable */
-          this.getGroomCourseListList = initList(res.data.list, 4).slice(0, 4);
+          this.getGroomCourseListList = res.data.list.slice(0, 4);
         }
       }).catch((err) => {
         this.showList.push(true);

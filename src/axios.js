@@ -28,11 +28,13 @@ axios.interceptors.request.use(
          clearTimeout(timer);
          let timer = setTimeout(()=>{
             store.commit('setNetWork',false);
-         },2000);
-         return;
+         },3000);
+         return Promise.reject(new Error('net error'))
       }
+        config.headers.sourceType = 'h5'; //来源 h5 pc
+
         config.headers.Authorization = store.getters.token ? store.getters.token : '-1';
-        config.headers.httpHost = window.location.host || '';
+        config.headers.httpHost = window.location.href || '';
         if(process.env.NODE_ENV === 'development'){
           config.headers.httpHost = process.env.VUE_APP_HOST;
         }

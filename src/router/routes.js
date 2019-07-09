@@ -82,15 +82,17 @@ const routes = [{
     keepAlive: true,
   },
   view: () => import(/* webpackChunkName: "group-index" */ '@/views/mycenter/index.vue'),
-}, {
-  title: '我的订单',
-  name: 'centerMyorder',
-  path: '/center/myorder',
-  meta: {
-    isNeedLogin: true, // 登录拦截
-  },
-  view: () => import(/* webpackChunkName: "group-my" */ '@/views/mycenter/myorder.vue'),
-}, {
+},
+// {
+//   title: '我的订单',
+//   name: 'centerMyorder',
+//   path: '/center/myorder',
+//   meta: {
+//     isNeedLogin: true, // 登录拦截
+//   },
+//   view: () => import(/* webpackChunkName: "group-my" */ '@/views/mycenter/myorder.vue'),
+// },
+{
   title: '我的收藏',
   name: 'centerMycol',
   path: '/center/mycol',

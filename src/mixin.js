@@ -46,40 +46,6 @@ export default {
           }
         },
       },
-      beforeRouteEnter(to, from, next) {
-        if (to.meta.isNeedLogin) {
-          // 是否需要登录
-          next((vm) => {
-            if (vm.name === 'common-layout') {
-              // layout 直接退出
-              return;
-            }
-            vm.setFromRoute(from.path);
-            if (!vm.token && !getUrlParam('code')) {
-              vm.login();
-              return;
-            }
-            if (!vm.token && getUrlParam('code')) {
-              // 获取token  下一周期 执行init
-              vm.getTokenByCode(vm.init);
-            }
-            if (!to.meta.isHideShare) {
-              vm.initWxShareFn();
-            }
-          });
-        } else {
-          next((vm) => {
-            if (vm.name === 'common-layout') {
-              // layout 直接退出
-              return;
-            }
-            vm.setFromRoute(from.path);
-            if (!to.meta.isHideShare) {
-              vm.initWxShareFn();
-            }
-          });
-        }
-      },
 
       created() {
         this.scrollInitHeight = window.innerHeight;
@@ -101,12 +67,12 @@ export default {
       },
       methods: {
         // 警告提示  $全局标记
-        $message(mes) {
+        $message(mes, type) {
           // toast 提示
           this.$createToast({
             time: 3000,
             txt: mes,
-            type: 'warn',
+            type: type || 'txt',
           }).show();
         },
 
@@ -115,8 +81,14 @@ export default {
 
           goLogin(type);
         },
-        loginoutFn() {
+
+        loginoutFn(flag) {
           // 退出登录，清空cookie
+          if (flag === true) {
+            // flag true 直接登录 不弹窗
+            loginout();
+            return;
+          }
           let oThis = this;
           this.$createDialog({
             type: 'confirm',
@@ -150,23 +122,16 @@ export default {
           }
           /* eslint-enable */
         },
-        toast(mes) {
-          // toast 提示
-          this.$createToast({
-            type: 'txt',
-            time: 3000,
-            txt: mes,
-          }).show();
-        },
+
         confirmLogin(message) {
           this.login();
           console.log(message);
         },
-        async getTokenByCode(fn) {
+        getTokenByCode(fn) {
           const code = getUrlParam('code');
           if (code && !this.token) {
             // code 存在  通过code获取token
-            await getToken({ code }).then((res) => {
+            getToken({ code }).then((res) => {
               // 设置token
               /* eslint-disable */
                 if(res.data.code === 0){
@@ -180,7 +145,7 @@ export default {
             }).catch((err) => {
               console.log(err);
               // 获取token 失败  退出登录 提示重新登录
-              this.$message('登录失败，请重新登录');
+              // this.$message('登录失败，请重新登录');
             });
           }
         },
@@ -233,7 +198,7 @@ export default {
           this.wxShareTitle = this.$route.meta.wxShareTitle
        || '优税学院';
           this.wxShareDesc = this.$route.meta.wxShareDesc || '财税大神进阶之路，职业发展更快一步';
-          this.wxShareUrl = location.href.split('#')[0];
+          this.wxShareUrl = window.location.href;
           this.wxShareImage = `${window.location.origin + this.publicPath}sharelogo.png`;
           this.wxShareFn();
         },
@@ -268,7 +233,7 @@ export default {
               }).show();
             }
           }
-          
+          // console.log(wxShareData);
           // alert('当前location:::'+location.href.split('#')[0]+'第一次请求接口url:::'+params.url)
           if(!getSystem().wx){
             // 不是微信环境

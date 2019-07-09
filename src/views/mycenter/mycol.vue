@@ -11,8 +11,8 @@
           ref="colScroll"
           :data="list"
           :options="options"
-          :scrollEvents="['scroll']"
-          @scroll="scroll"
+          :scrollEvents="['scroll-end']"
+          @scroll-end="scroll"
           @pulling-up="onPullingUp">
         <!-- 上拉加载 -->
         <!-- 展示区域 -->
@@ -76,7 +76,7 @@ export default {
       pageSize: 15, // 每页条数
       total: 0, // 总条数
       pullUpLoad: true,
-      pullUpLoadThreshold: 0,
+      pullUpLoadThreshold: 100,
       pullUpLoadMoreTxt: '上拉加载',
       pullUpLoadNoMoreTxt: '已经到底了~',
       isShowBackTop: false, // 返回顶部
@@ -132,7 +132,7 @@ export default {
       }
     },
     scrollToTop() {
-      this.$refs.colScroll.scrollTo(0, 0);
+      this.$refs.colScroll.scrollTo(0, 0, 300);
       this.isShowBackTop = false;
     },
     onPullingUp(t) {
@@ -206,16 +206,21 @@ export default {
       saveMyCollection(this.saveMyCollectionParam).then((res) => {
         this.isCanRequest = true;
         if (res.data.code === '0000') {
-          // this.init();
-          this.cancelSucFn(this.saveMyCollectionParam.courseId);
-          this.$message('已取消收藏');
+          // res.data.type === '1' 收藏   0 取消收藏
+          if (res.data.type === '0') {
+            this.cancelSucFn(this.saveMyCollectionParam.courseId);
+            this.$message('已取消收藏');
+          } else {
+            // 如果是收藏  再次取消
+            this.saveMyCollectionFn(item);
+          }
         } else if (res.data.code !== '0002') {
           this.$message('取消失败，请重新操作');
         }
       }).catch((err) => {
         this.isCanRequest = true;
         console.log(err);
-        this.$message('取消失败，请重新操作');
+        // this.$message('取消失败，请重新操作');
       });
     },
     cancelSucFn(cid) {

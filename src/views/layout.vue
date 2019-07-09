@@ -13,7 +13,7 @@
     <!-- 网络连接出错 -->
     <div v-if="netWorkError" class="network-error">
       <i class="icon-neterror"></i>
-      网络连接出错
+      网络不给力~
     </div>
     <!-- 请求loadding -->
     <div v-if="requestLoading" class="request-loading">
@@ -59,7 +59,11 @@ export default {
         this.$loading().close();
       }
     },
-    token() {
+    token(newval, oldval) {
+      if (oldval && !newval) {
+        this.loginoutFn(true);
+        return;
+      }
       if (!this.token && !this.$route.meta.isNeedLogin) {
         this.getTokenByCode();
       }

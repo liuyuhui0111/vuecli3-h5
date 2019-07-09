@@ -12,8 +12,8 @@
           ref="siginScroll"
           :data="list"
           :options="options"
-          :scrollEvents="['scroll']"
-          @scroll="scroll"
+          :scrollEvents="['scroll-end']"
+          @scroll-end="scroll"
           @pulling-up="onPullingUp">
         <!-- 上拉加载 -->
         <!-- 展示区域 -->
@@ -85,7 +85,7 @@ export default {
       pageSize: 15, // 每页条数
       total: 0, // 总条数
       pullUpLoad: true,
-      pullUpLoadThreshold: 0,
+      pullUpLoadThreshold: 100,
       pullUpLoadMoreTxt: '上拉加载',
       pullUpLoadNoMoreTxt: '已经到底了~',
       isShowBackTop: false, // 返回顶部
@@ -99,7 +99,7 @@ export default {
       this.init();
     },
   },
-  created() {
+  mounted() {
     this.init();
   },
   computed: {
@@ -126,6 +126,9 @@ export default {
       this.isShowPage = false;
       this.list = [];
       // 获取在线课程导航
+      if (!this.token) {
+        return;
+      }
       this.onPullingUp('init');
     },
     scroll(pos) {
@@ -136,7 +139,7 @@ export default {
       }
     },
     scrollToTop() {
-      this.$refs.siginScroll.scrollTo(0, 0);
+      this.$refs.siginScroll.scrollTo(0, 0, 300);
       this.isShowBackTop = false;
     },
     onPullingUp(t) {

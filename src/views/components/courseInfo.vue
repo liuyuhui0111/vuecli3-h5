@@ -38,7 +38,7 @@
             </div>
         </div>
         <div id="shareDesc" class="introduce_outer">
-            <span v-html="detailData.introduce || detailData. courseBrief">
+            <span v-html="transferStringFn(detailData.introduce || detailData. courseBrief)">
             </span>
         </div>
     </template>
@@ -52,7 +52,7 @@
         </div>
         <div v-if="!detailData.teacherIntroduction" class="introduce_outer">
             <span
-                    v-html="detailData.outline || detailData.courseIncome">
+                    v-html="transferStringFn(detailData.outline || detailData.courseIncome)">
 
             </span>
         </div>
@@ -68,7 +68,7 @@
             </div>
             <div class="introduce_outer">
                 <span
-                        v-html="detailData.outline || detailData.courseOutline">
+                        v-html="transferStringFn(detailData.outline || detailData.courseOutline)">
                 </span>
             </div>
         </template>
@@ -81,7 +81,7 @@
             </div>
         </div>
         <div v-if="detailData.teacherIntroduction" class="introduce_outer">
-            <span v-html="detailData.plan"></span>
+            <span v-html="transferStringFn(detailData.plan)"></span>
         </div>
         </template>
 
@@ -90,7 +90,7 @@
 
 <script>
 import { formatDate } from '@/assets/utils/timefn';
-import { setScrollTop } from '@/assets/utils/util';
+import { transferString } from '@/assets/utils/util';
 
 const defaultPhotoUrl = require('@/views/imgs/default.png');
 
@@ -111,6 +111,7 @@ export default {
     getTime() {
       return `${formatDate(this.detailData.startTime, 'true')} ~ ${formatDate(this.detailData.endTime, 'true')}`;
     },
+
   },
   methods: {
     // aClick(id) {
@@ -121,13 +122,15 @@ export default {
     //   a.click();
     //   a.remove();
     // },
+    transferStringFn(str) {
+      return transferString(str);
+    },
     // 滚动条滚动到指定元素位置
     scrollToDom(id) {
       console.log(id);
       const obj = document.getElementById(`content${id}`);
       if (obj) {
-        const top = obj.offsetTop;
-        setScrollTop(top);
+        obj.scrollIntoView({ block: 'start', behavior: 'smooth' });
       }
     },
   },

@@ -8,10 +8,10 @@ baseProxyUrl = process.env.NODE_ENV === 'development' ? process.env.VUE_APP_URL 
 
 let proxyData = {
     'http://test.5ifapiao.com:8888': [
-        '/fatscourse',
+        // '/fatscourse',
         '/ele-myinvoice', '/course_authentication', '/course_api-gateway'
     ], //分享
-    // 'http://10.1.28.167:9983': ['/fatscourse'],
+    'http://10.1.28.167:9983': ['/fatscourse'],
     // 'http://10.1.28.153:9983': ['/fatscourse'],
 };
 
@@ -33,7 +33,7 @@ Object.keys(proxyData).forEach((key) => {
         proxy[item].pathRewrite[pathRewrite] = item;
     });
 });
-
+// console.log(proxy);
 
 module.exports = {
     // 基本路径

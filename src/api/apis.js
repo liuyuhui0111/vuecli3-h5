@@ -11,11 +11,11 @@ import {
 const { SSO_URL } = COMMON_ENV;
 const CLIENT_ID = 'fatc';
 const BASE_URL = '/fatscourse';
-export function goLogin(type) {
-  const REDIRECT_URI = encodeURIComponent(replaceCode());
+export function goLogin(type, path) {
+  const REDIRECT_URI = encodeURIComponent(replaceCode(false, path));
   // alert(replaceCode())
   // 去登录页 去登录的时候本地缓存 REDIRECT_URI 获取token传参无需编码，直接存href
-  window.localStorage.setItem('REDIRECT_URI', replaceCode());
+  window.localStorage.setItem('REDIRECT_URI', replaceCode(false, path));
 
   let url = `/oauth/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}`;
   // let flag = confirm(`登录REDIRECT_URI地址是${replaceCode()}`);
@@ -49,7 +49,7 @@ export function wxShare() {
     if (!window.enterUrl) {
       window.enterUrl = window.location.href.split('#')[0];
     }
-    // params.url = window.enterUrl;
+    params.url = window.enterUrl;
   }
    /* eslint-enable */
 
@@ -64,7 +64,7 @@ export function loginout() {
   const REDIRECT_URI = encodeURIComponent(replaceCode());
   window.localStorage.setItem('REDIRECT_URI', replaceCode());
   const url = `/course_authentication/h5/logout?redirect_uri=${REDIRECT_URI}`;
-  window.location.replace(SSO_URL + url);
+  window.location.href = SSO_URL + url;
 }
 
 export function locations(params) {
@@ -200,7 +200,7 @@ export function getSearchOffList(params) {
 }
 
 export function getCourse(params) {
-  // 根据id查询线上课
+  // 根据id查询线上课 h5代表来源
   const url = `${BASE_URL}/courseUnlogin-web/getCourse`;
   return post(url, params || {});
 }

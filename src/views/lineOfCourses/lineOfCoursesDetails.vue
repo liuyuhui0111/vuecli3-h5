@@ -356,7 +356,7 @@ export default {
         }).catch((err) => {
           console.log(err);
           this.isShowIframe = false;
-          this.$message('获取视频播放地址失败，请稍后再试');
+          // this.$message('获取视频播放地址失败，请稍后再试');
         });
       }
     },
@@ -394,7 +394,7 @@ export default {
       }).catch((err) => {
         this.isCanRequest = true;
         console.log(err);
-        this.$message('消耗权益失败，请重试');
+        // this.$message('消耗权益失败，请重试');
       });
     },
     // 流量继续播放
@@ -477,7 +477,7 @@ export default {
         this.startPlay();
       } else {
         // 未登录
-        this.$message('该章节需要登录才可以继续观看');
+        this.confirmLogin();
         // this.$message({
         //   message: '该章节需要登录才可以继续观看',
         //   type: 'warning',
@@ -518,7 +518,7 @@ export default {
     checkUserIsCanPlay() {
       // 判断用户是否登录
       if (!this.token) {
-        this.$message('该章节需要登录才可以继续观看');
+        this.confirmLogin();
         return;
       }
       if (this.token) {
@@ -551,7 +551,7 @@ export default {
           }
         }).catch((err) => {
           console.log(err);
-          this.$message('服务器错误，请稍后再试');
+          // this.$message('服务器错误，请稍后再试');
         });
       }
     },
@@ -588,18 +588,19 @@ export default {
 
       saveMyCollection(this.saveMyCollectionParam).then((res) => {
         if (res.data.code === '0000') {
-          this.isColl = !this.isColl;
-          if (this.isColl) {
-            this.toast('已收藏');
+          if (res.data.type === '0') {
+            this.isColl = false;
+            this.$message('已取消收藏');
           } else {
-            this.toast('已取消收藏');
+            this.isColl = true;
+            this.$message('已收藏');
           }
         } else {
           this.$message(res.data.message);
         }
       }).catch((err) => {
         console.log(err);
-        this.$message('服务器错误，请稍后再试');
+        // this.$message('服务器错误，请稍后再试');
       });
     },
     getCourseFn() {
