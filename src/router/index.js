@@ -90,7 +90,7 @@ router.beforeEach(async (to, from, next) => {
     return;
   }
 
-  if (to.meta.isNeedLogin) {
+  if (to.meta.isNeedLogin && !store.getters.token) {
     // 是否需要登录 登录拦截
     if (!store.getters.token && !getUrlParam('code')) {
       // 如果需要登录 且没有code
