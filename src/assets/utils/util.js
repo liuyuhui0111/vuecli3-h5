@@ -1,110 +1,110 @@
-
 const COMMON_TOKEN = 'token'; // token 字段名称
 const COMMON_TOKEN_DAY = 0; // token失效时间7天
 const COMMON_REPLACE_URL = 'COMMONREPLACEURL'; // 将#号替换成COMMON_REPLACE_URL 去登录
 
 function setCookie(name, value, day) {
-  // 写cookies
-  if (!value) {
-    return null;
-  }
-  try {
-    const Days = day || 30;
-    const exp = new Date();
-    let val = value;
-    exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
-    if (typeof (val) !== 'string') {
-      val = JSON.stringify(value);
+    // 写cookies
+    if (!value) {
+        return null;
     }
-    if (!day) {
-      document.cookie = `${name}=${escape(val)};`;
-    } else {
-      document.cookie = `${name}=${escape(val)};expires=${exp.toGMTString()}`;
+    try {
+        const Days = day || 30;
+        const exp = new Date();
+        let val = value;
+        exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+        if (typeof(val) !== 'string') {
+            val = JSON.stringify(value);
+        }
+        if (!day) {
+            document.cookie = `${name}=${escape(val)};`;
+        } else {
+            document.cookie = `${name}=${escape(val)};expires=${exp.toGMTString()}`;
+        }
+    } catch (e) {
+        return null;
     }
-  } catch (e) {
-    return null;
-  }
-  return true;
+    return true;
 }
 
 function getCookie(name) {
-  // 读cookie
-  const reg = new RegExp(`(^| )${name}=([^;]*)(;|$)`);
-  const arr = document.cookie.match(reg);
-  if (arr) { return unescape(arr[2]); }
-  return null;
+    // 读cookie
+    const reg = new RegExp(`(^| )${name}=([^;]*)(;|$)`);
+    const arr = document.cookie.match(reg);
+    if (arr) {
+        return unescape(arr[2]); }
+    return null;
 }
 
 function delCookie(name) {
-  // 删除cookie
-  const exp = new Date();
-  exp.setTime(exp.getTime() - 1);
-  const cval = getCookie(name);
-  if (cval != null) { document.cookie = `${name}=${cval};expires=${exp.toGMTString()}`; }
+    // 删除cookie
+    const exp = new Date();
+    exp.setTime(exp.getTime() - 1);
+    const cval = getCookie(name);
+    if (cval != null) { document.cookie = `${name}=${cval};expires=${exp.toGMTString()}`; }
 }
 
 function getScrollTop() {
-  // 获取当前滚动条高度
-  return document.documentElement.scrollTop || document.body.scrollTop;
+    // 获取当前滚动条高度
+    return document.documentElement.scrollTop || document.body.scrollTop;
 }
 
 function setScrollTop(endTop) {
-  // 设置当前滚动条高度
-  clearInterval(window.scrollToptimer);
-  let top = document.body.scrollTop || document.documentElement.scrollTop;
-  let speed = (endTop - top) / 18;
-  let curTop = document.body.scrollTop || document.documentElement.scrollTop;
-  window.scrollToptimer = setInterval(() => {
-    console.log(`定时循环回到顶部${curTop}`);
-    curTop += speed;
-    if (speed < 0) {
-      if (curTop <= endTop) {
-        clearInterval(window.scrollToptimer);
-        curTop = endTop;
-      }
-    } else if (curTop >= endTop) {
-      clearInterval(window.scrollToptimer);
-      curTop = endTop;
-    }
-    document.body.scrollTop = curTop;
-    if (document.documentElement) {
-      document.documentElement.scrollTop = curTop;
-    }
-  }, 17);
+    // 设置当前滚动条高度
+    clearInterval(window.scrollToptimer);
+    let top = document.body.scrollTop || document.documentElement.scrollTop;
+    let speed = (endTop - top) / 18;
+    let curTop = document.body.scrollTop || document.documentElement.scrollTop;
+    window.scrollToptimer = setInterval(() => {
+        console.log(`定时循环回到顶部${curTop}`);
+        curTop += speed;
+        if (speed < 0) {
+            if (curTop <= endTop) {
+                clearInterval(window.scrollToptimer);
+                curTop = endTop;
+            }
+        } else if (curTop >= endTop) {
+            clearInterval(window.scrollToptimer);
+            curTop = endTop;
+        }
+        document.body.scrollTop = curTop;
+        if (document.documentElement) {
+            document.documentElement.scrollTop = curTop;
+        }
+    }, 17);
 }
 
 function initWxShareUrl(url) {
-  /*eslint-disable*/ 
-  // 删除链接里微信自动拼接的from isappinstalled sharer_username scene clicktime
-  const delFromReg = /from\=\w*(&|$)/;
-  const delsharer_username = /sharer_username\=\w*(&|$)/;
-  const delscene = /scene\=\w*(&|$)/;
-  const delclicktime = /clicktime\=\w*(&|$)/;
-  const delIsappinstalledReg = /isappinstalled\=\w*(&|$)/;
-  let href = url.replace(delFromReg, '')
-    .replace(delIsappinstalledReg, '')
-    .replace(delsharer_username, '')
-    .replace(delscene, '')
-    .replace(delclicktime, '');
-  if (href.substr(href.length - 1, 1) === '?' || href.substr(href.length - 1, 1) === '&') {
-    // 如果最后一个字符是？
-    href = href.substring(0, href.length - 1);
-  }
-  return href;
-  /* eslint-enable */
+    /*eslint-disable*/
+    // 删除链接里微信自动拼接的from isappinstalled sharer_username scene clicktime
+    const delFromReg = /from\=\w*(&|$)/;
+    const delsharer_username = /sharer_username\=\w*(&|$)/;
+    const delscene = /scene\=\w*(&|$)/;
+    const delclicktime = /clicktime\=\w*(&|$)/;
+    const delIsappinstalledReg = /isappinstalled\=\w*(&|$)/;
+    let href = url.replace(delFromReg, '')
+        .replace(delIsappinstalledReg, '')
+        .replace(delsharer_username, '')
+        .replace(delscene, '')
+        .replace(delclicktime, '');
+    if (href.substr(href.length - 1, 1) === '?' || href.substr(href.length - 1, 1) === '&') {
+        // 如果最后一个字符是？
+        href = href.substring(0, href.length - 1);
+    }
+    return href;
+    /* eslint-enable */
 }
 
 // 将url中code=xxx 替换成空字符串
 function replaceCode(url, fullPath) {
-  /*eslint-disable*/
+    /*eslint-disable*/
     const reg = /code\=\w*(&|$)/;
     let href = url || window.location.href;
     let host = href.split('#')[0];
     let fromQuery = '';
-    host=initWxShareUrl(host);  //清除微信自带的一些来源信息
-    if(host.indexOf('?')!==-1){
-      host = host.split('?')[0];
-      fromQuery = '&'+host.split('?')[1];
+    host = initWxShareUrl(host); //清除微信自带的一些来源信息
+    if (host.indexOf('?') !== -1) {
+        host = host.split('?')[0];
+        fromQuery = '&' + host.split('?')[1];
     }
 
     let hashUrl = fullPath || window.location.hash.replace('#', '');
@@ -117,163 +117,263 @@ function replaceCode(url, fullPath) {
 
     href = host + `?${COMMON_REPLACE_URL}=${path}${query}${fromQuery}`;
 
-    href=href.replace(reg, '');
+    href = href.replace(reg, '');
 
     if (href.substr(href.length - 1, 1) === '?' || href.substr(href.length - 1, 1) === '&') {
         // 如果最后一个字符是？
         href = href.substring(0, href.length - 1);
     }
- /* eslint-enable */
-  return initWxShareUrl(href);
+    /* eslint-enable */
+    return initWxShareUrl(href);
 }
 
 
 // 获取url中的参数
 function getUrlParam(name) {
-  const reg = new RegExp(`(^|&)${name}=([^&]*)(&|$)`);
-  let query = window.location.href.split('?')[1] || '';
-  const r = query.match(reg);
-  if (r != null) {
-    return decodeURI(r[2]);
-  }
-  return null;
+    const reg = new RegExp(`(^|&)${name}=([^&]*)(&|$)`);
+    let query = window.location.href.split('?')[1] || '';
+    const r = query.match(reg);
+    if (r != null) {
+        return decodeURI(r[2]);
+    }
+    return null;
 }
 
 
 function initList(arr, arrnum) {
-  /**
-          * 数组补位
-          * @desc arr 要补位的数组 num 要补的位数
-          * @author liuyuhui
-          * @date 2019年4月19日17:33:59
-    */
-  const num = arr.length % arrnum === 0 ? 0 : arrnum - (arr.length % arrnum); // 计算需要补位的数量
-  if (num !== 0) {
-    // 如果能被4整除且当前页条数小于当页最大条数，开始补位
-    for (let i = 0; i < num; i += 1) {
-      arr.push(null);
+    /**
+     * 数组补位
+     * @desc arr 要补位的数组 num 要补的位数
+     * @author liuyuhui
+     * @date 2019年4月19日17:33:59
+     */
+    const num = arr.length % arrnum === 0 ? 0 : arrnum - (arr.length % arrnum); // 计算需要补位的数量
+    if (num !== 0) {
+        // 如果能被4整除且当前页条数小于当页最大条数，开始补位
+        for (let i = 0; i < num; i += 1) {
+            arr.push(null);
+        }
     }
-  }
-  return arr;
+    return arr;
 }
 
 function getTokenFn() {
-  // return getCookie(COMMON_TOKEN);
-  return window.localStorage.getItem(COMMON_TOKEN);
+    // return getCookie(COMMON_TOKEN);
+    return window.localStorage.getItem(COMMON_TOKEN);
 }
 
 function setTokenFn(token) {
-  if (token) {
-    window.localStorage.setItem(COMMON_TOKEN, token);
-    setCookie(COMMON_TOKEN, token, COMMON_TOKEN_DAY);
-    // window.localStorage.setItem(COMMON_TOKEN,token);
-  } else {
-    delCookie(COMMON_TOKEN);
-    window.localStorage.removeItem(COMMON_TOKEN);
-    // 清除本地缓存信息
-    // window.sessionStorage.removeItem(COMMON_TOKEN);
-    window.sessionStorage.removeItem('commonUserData');
-  }
+    if (token) {
+        window.localStorage.setItem(COMMON_TOKEN, token);
+        setCookie(COMMON_TOKEN, token, COMMON_TOKEN_DAY);
+        // window.localStorage.setItem(COMMON_TOKEN,token);
+    } else {
+        delCookie(COMMON_TOKEN);
+        window.localStorage.removeItem(COMMON_TOKEN);
+        // 清除本地缓存信息
+        // window.sessionStorage.removeItem(COMMON_TOKEN);
+        window.sessionStorage.removeItem('commonUserData');
+    }
 }
 
 
 function transferString(content) {
-  // 替换回车
-  let string = content;
-  if (!string) return null;
-  try {
-    string = string.replace(/\r\n/g, '<br>');
-    string = string.replace(/\n/g, '<br>');
-  } catch (e) {
-    console.log(e);
-  }
-  return string;
+    // 替换回车
+    let string = content;
+    if (!string) return null;
+    try {
+        string = string.replace(/\r\n/g, '<br>');
+        string = string.replace(/\n/g, '<br>');
+    } catch (e) {
+        console.log(e);
+    }
+    return string;
 }
 
 function getNetworkType() {
-  // 获取网络状态,wifi net 流量
-  let ua = navigator.userAgent;
-  let networkStr = ua.match(/NetType\/\w+/) ? ua.match(/NetType\/\w+/)[0] : 'NetType/other';
-  networkStr = networkStr.toLowerCase().replace('nettype/', '');
-  let networkType;
-  console.log(ua);
-  console.log(networkStr);
-  switch (networkStr) {
-    case 'wifi':
-      networkType = 'wifi';
-      break;
-    case '5g':
-      networkType = 'net';
-      break;
-    case '4g':
-      networkType = 'net';
-      break;
-    case '3g':
-      networkType = 'net';
-      break;
-    case '3gnet':
-      networkType = 'net';
-      break;
-    case '2g':
-      networkType = 'net';
-      break;
-    default:
-      networkType = 'error';
-  }
-  return networkType;
+    // 获取网络状态,wifi net 流量
+    let ua = navigator.userAgent;
+    let networkStr = ua.match(/NetType\/\w+/) ? ua.match(/NetType\/\w+/)[0] : 'NetType/other';
+    networkStr = networkStr.toLowerCase().replace('nettype/', '');
+    let networkType;
+    console.log(ua);
+    console.log(networkStr);
+    switch (networkStr) {
+        case 'wifi':
+            networkType = 'wifi';
+            break;
+        case '5g':
+            networkType = 'net';
+            break;
+        case '4g':
+            networkType = 'net';
+            break;
+        case '3g':
+            networkType = 'net';
+            break;
+        case '3gnet':
+            networkType = 'net';
+            break;
+        case '2g':
+            networkType = 'net';
+            break;
+        default:
+            networkType = 'error';
+    }
+    return networkType;
 }
 
 function getSystem() {
-  // 获取系统环境
-  /*eslint-disable*/
-  let sys = {
-    wx: false,
-    android: false,
-    ios: false,
-  };
-  let ua = window.navigator.userAgent;
-  let wxua = window.navigator.userAgent.toLowerCase();
-  if (wxua.match(/MicroMessenger/i) == 'micromessenger') {
-    sys.wx = true;
-  } else {
-    sys.wx = false;
-  }
-  sys.android = ua.indexOf('Android') > -1 || ua.indexOf('Linux') > -1;
-  sys.ios = !!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-  /* eslint-enable */
-  return sys;
+    // 获取系统环境
+    /*eslint-disable*/
+    let sys = {
+        wx: false,
+        android: false,
+        ios: false,
+    };
+    let ua = window.navigator.userAgent;
+    let wxua = window.navigator.userAgent.toLowerCase();
+    if (wxua.match(/MicroMessenger/i) == 'micromessenger') {
+        sys.wx = true;
+    } else {
+        sys.wx = false;
+    }
+    sys.android = ua.indexOf('Android') > -1 || ua.indexOf('Linux') > -1;
+    sys.ios = !!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+    /* eslint-enable */
+    return sys;
 }
 
 function paramsStr(url) {
-  /*eslint-disable*/
-  let hash;
-  let myJson = {};
-  if (!url) {
+    /*eslint-disable*/
+    let hash;
+    let myJson = {};
+    if (!url) {
+        return myJson;
+    }
+    let hashes = url.slice(url.indexOf('?') + 1).split('&');
+    for (let i = 0; i < hashes.length; i++) {
+        hash = hashes[i].split('=');
+        myJson[hash[0]] = hash[1];
+    }
     return myJson;
+    /* eslint-enable */
+}
+
+function cached(fn){
+  // 创建一个缓存对象
+  const cache = Object.create(null);
+  return (function cachedFn(str){
+  // 先从缓存对象中找，要操作的值，是否已经有了操作结果
+  const hit = cache[str];
+  // 如果有，则直接返回；没有，则调用函数对值进行操作，并把操作结果存在缓存对象中
+  return hit || ( cache[str] =fn(str));
+  });
+}
+
+function isObject(obj){
+  return obj !== null && typeof obj === 'object';
+}
+function looseEqual (a , b ) {
+  // 如果是同一个对象，则相同
+
+  
+if (a === b ) return true;
+
+  
+// 判断是否是对象
+
+  
+const isObjectA = isObject (a )
+  
+const isObjectB = isObject (b )
+  
+// 两者都是对象
+
+  
+if (isObjectA && isObjectB ) {
+    
+try {
+      
+// 判断是否是数组
+
+      
+const isArrayA = Array . isArray (a )
+      
+const isArrayB = Array . isArray (b )
+      
+// 两者都是数组
+
+      
+if (isArrayA && isArrayB ) {
+        
+// 长度要一样，同时每一项都要相同，递归调用
+
+        
+return a . length === b . length && a . every ((e , i ) => {return looseEqual (e , b [i ]) })
+      
+} else if (a instanceof Date && b instanceof Date ) {
+// 如果都是时间对象，则需要保证时间戳相同
+
+        
+return a . getTime () === b . getTime ()
+      
+} else if (! isArrayA && ! isArrayB ) {
+// 两者都不是数组，则为对象
+
+        
+// 拿到两者的key值，存入数组
+
+        
+const keysA = Object . keys (a )
+        
+const keysB = Object . keys (b )
+        
+// 属性的个数要一样，递归的判断每一个值是否相同
+
+        
+return keysA . length === keysB . length && keysA . every (key => {return looseEqual (a [key ], b [key ]) })
+      
+} else {return false }
+    
+} catch (e ) {return false }
+  
+} else if (! isObjectA && ! isObjectB ) {
+// 两者都不是对象
+
+    
+// 转成字符串后，值是否一致
+
+    
+return String (a ) === String (b ) 
+} else {return false } 
+}
+
+function once (fn ) {
+  let called = false
+return function () {
+    
+if (! called ) {
+      called = true
+      fn.apply (this , arguments )
   }
-  let hashes = url.slice(url.indexOf('?') + 1).split('&');
-  for (let i = 0; i < hashes.length; i++) {
-    hash = hashes[i].split('=');
-    myJson[hash[0]] = hash[1];
-  }
-  return myJson;
-  /* eslint-enable */
+}
 }
 
 export {
-  COMMON_REPLACE_URL,
-  setTokenFn,
-  getTokenFn,
-  setCookie,
-  getCookie,
-  delCookie,
-  getScrollTop,
-  setScrollTop,
-  replaceCode,
-  getUrlParam,
-  initList,
-  transferString,
-  getNetworkType,
-  getSystem,
-  paramsStr,
+    COMMON_REPLACE_URL,
+    setTokenFn,
+    getTokenFn,
+    setCookie,
+    getCookie,
+    delCookie,
+    getScrollTop,
+    setScrollTop,
+    replaceCode,
+    getUrlParam,
+    initList,
+    transferString,
+    getNetworkType,
+    getSystem,
+    paramsStr,
 };
