@@ -45,7 +45,7 @@ export function wxShare() {
   };
   if (getSystem().ios) {
     // 如果是ios
-    /*eslint-disable*/ 
+    /*eslint-disable*/
     if (!window.enterUrl) {
       window.enterUrl = window.location.href.split('#')[0];
     }
@@ -106,7 +106,7 @@ export function getToken(params) {
 
 export function getUserInfo(params) {
   // 获取用户信息
-  const url = `${BASE_URL}/personal-web/queryPersonal`;
+  const url = `${BASE_URL}/personal-web/userInformation`;
   return post(url, params || {}, { isHideLoading: true });
 }
 
@@ -319,6 +319,12 @@ export function queryList(params) {
   return post(url, params || {});
 }
 
+export function queryListDetialById(params) {
+  // 会员权益指定课程
+  const url = `${BASE_URL}/membercenter/queryListDetialById`;
+  return post(url, params || {});
+}
+
 export function findRights(params) {
   // 下订单前查询权益
   const url = `${BASE_URL}/orderInfo/findRights`;
@@ -381,5 +387,11 @@ export function getOrderInfo(params) {
 export function getSourceData(params) {
   // 查询主体信息
   const url = `${BASE_URL}/source-web/getSourceData`;
+  return post(url, params || {});
+}
+
+export function queryOffLineClassList(params) {
+  // 查询主体信息
+  const url = `${BASE_URL}/myClass-web/queryOffLineClassList`;
   return post(url, params || {});
 }

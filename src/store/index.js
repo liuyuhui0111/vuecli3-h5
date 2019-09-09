@@ -2,6 +2,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import user from './modules/user';
+import order from './modules/order';
 import getters from './getters'
 import {getTokenFn, setTokenFn} from '@/assets/utils/util'
 
@@ -14,10 +15,13 @@ export default new Vuex.Store({
 		token:getTokenFn() ? getTokenFn() : '',		//token
 		COMMON_COMP_DATA:{},
 		fromRoute:'',			//来源路由path
+		isqimoChatClickFlag:false,		//在线客服加载完成
 	},
-	getters: {},
 	actions: {},
 	mutations: {
+		setIsqimoChatClickFlag(state, flag) {
+	    state.isqimoChatClickFlag = flag;
+	  },
 	  setCopData(state,data){
 	  	state.COMMON_COMP_DATA = JSON.parse(JSON.stringify(data));
 	  },
@@ -28,7 +32,7 @@ export default new Vuex.Store({
 	  	state.requestLoading = flag;
 	  },
 	  setFromRoute(state,path){
-	  	state.fromRoute = path || '';
+	  	state.fromRoute = encodeURIComponent(path || '');
 	  },
 	  setToken(state,token) {
 	  	// 设置token  同步到cookie 有效期默认7天
@@ -39,6 +43,7 @@ export default new Vuex.Store({
 	},
     modules: {
         user,
+        order,
     },
     getters
 });

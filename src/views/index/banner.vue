@@ -5,7 +5,7 @@
         :width="756"
         :height="240"
         :lazy="lazy"
-        @click="swiperClick(list[0])"
+        @click="swiperClick(list[0],0)"
         :src="list[0].pic"
         :alt="list[0].title">
         </baseImg>
@@ -25,7 +25,7 @@
         :width="756"
         :height="240"
         :lazy="lazy"
-        @click="swiperClick(item)"
+        @click="swiperClick(item,index)"
         :src="item.pic"
         :alt="item.title">
         </baseImg>
@@ -50,6 +50,7 @@ export default {
     return {
       name: 'banner',
       lazy: false,
+      flag: true,
       options: {
         loop: true,
         autoPlay: true,
@@ -73,8 +74,10 @@ export default {
   //   },
   // },
   methods: {
-    swiperClick(swiperItem) {
-      if (swiperItem.url) {
+    swiperClick(swiperItem, index) {
+      if (swiperItem.url && this.flag) {
+        this.ysxy_columnClick({ LocationName: `运营位${index + 1}`, columnTitle: '首页bannan' });
+        this.flag = false;
         // 如果存在href 跳转
         window.location.href = swiperItem.url;
       }

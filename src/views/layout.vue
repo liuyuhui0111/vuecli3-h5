@@ -27,6 +27,8 @@
   </div>
 </template>
 <script>
+/* eslint-disable prefer-destructuring */
+
 import FootNav from '@/views/components/foot-nav.vue';
 import {
   getSourceData,
@@ -97,6 +99,30 @@ export default {
         if (res.data.code === '0000') {
           // 获取成功
           this.setCopData(res.data.sourceData);
+          // 动态插入客服数据
+          if (document.getElementById('qimoChatScript')) {
+            this.setIsqimoChatClickFlag(true);
+            return;
+          }
+          let url = '';
+          let standbyField = res.data.sourceData.standbyFieldOne;
+          if (standbyField.indexOf('|') !== -1) {
+            let urlArr = standbyField.split('|');
+            url = urlArr[1];
+          } else {
+            url = standbyField;
+          }
+          console.log('客服src', url);
+          // let accessId = '60b5ca80-a22f-11e9-8ca3-3f368529f02c';
+          let src = url;
+          let script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.id = 'qimoChatScript';
+          script.src = src;
+          document.getElementsByTagName('head')[0].appendChild(script);
+          script.onload = () => {
+            this.setIsqimoChatClickFlag(true);
+          };
         }
       }).catch((err) => {
         this.isCanRequest = true;

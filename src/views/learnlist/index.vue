@@ -2,11 +2,19 @@
   <div class="learnlist">
 
 
-    <div class="empty" v-show="list.length<1 && isShowPage">
+    <!-- 顶部导航 -->
+    <basenav curindex="0" :list="navlist"></basenav>
+
+    <div v-show="list.length<1 && isShowPage"
+    class="emptybg">
+    <div class="empty" >
       <span class="icon-empty"></span>
       <p @click="routerReplace('/online-class')">还没有学习记录哦~ <br>
-      <span class="active">现在去学习</span></p>
+      <span class="active">现在去选课</span></p>
     </div>
+    </div>
+
+
     <div v-if="list.length>0" class="view-wrapper">
       <cube-scroll
           ref="learnlistScroll"
@@ -30,20 +38,22 @@
               :style="{width:props.item.proportion}"></span>
               </div>
               <span class="num" :title="props.item.title"
-              :class="{active:props.item.proportion=='100%'}">{{props.item.proportion}}</span>
+              :class="{active:props.item.proportion=='100%'}">已学{{props.item.proportion}}</span>
             </div>
           </template>
           </ClassCard>
         </div >
 
         </div>
-        <div class="h80"></div>
+        <div v-if="list.length>14" class="h80"></div>
         <template slot="pullup" slot-scope="props">
           <div v-if="props.isPullUpLoad" class="tips">
             加载中...
           </div>
           <div v-else class="tips">
-            已经到底了~
+            <span v-show="list.length>14">
+              没有更多了~
+            </span>
           </div>
           </template>
       </cube-scroll>
@@ -60,20 +70,38 @@ import {
   queryClassList,
 } from '@/api/apis';
 import ClassCard from '@/views/components/card.vue';
+import basenav from '@/views/components/nav.vue';
 
 export default {
   name: 'learnlist',
+  components: {
+    ClassCard,
+    basenav,
+  },
   data() {
     return {
+      type: '1', // 1线上课 2线下公开课
+      navlist: [
+        {
+          text: '线上课',
+          type: '1',
+          path: '/center/myclass',
+        },
+        {
+          text: '线下课',
+          type: '2',
+          path: '/center/offline',
+        },
+      ],
       list: [],
       isShowPage: false,
       pageNum: 1, // 页面
-      pageSize: 10, // 每页条数
+      pageSize: 15, // 每页条数
       total: 0, // 总条数
       pullUpLoad: true,
       pullUpLoadThreshold: 100,
       pullUpLoadMoreTxt: '上拉加载',
-      pullUpLoadNoMoreTxt: '已经到底了~',
+      pullUpLoadNoMoreTxt: '没有更多了~',
       isShowBackTop: false, // 返回顶部
 
       params: {
@@ -81,9 +109,7 @@ export default {
       },
     };
   },
-  components: {
-    ClassCard,
-  },
+
   watch: {
     $route() {
       this.init();
@@ -186,8 +212,17 @@ export default {
 };
 </script>
 <style scoped>
-.h80{
-  height: 80px;
+
+.emptybg{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 41px;
+}
+
+  .h80{
+  height: 57px;
   display: block;
   position: relative;
   overflow: hidden;
@@ -198,7 +233,7 @@ export default {
   color: #868686;
   text-align: center;
   font-size: 12px;
-  padding: 30px 0;
+  padding: 7px 0 30px 0;
   height: 20px;
   line-height: 20px;
   position: absolute;
@@ -208,37 +243,42 @@ export default {
   position: relative;
   width: 100%;
   height: 17px;
-  padding-right: 36px;
+  padding-right: 60px;
   box-sizing:border-box;
 }
 .line .linebox{
   position: relative;
   width: 100%;
   height: 17px;
+
 }
 .line .linebox:after{
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 5px;
   top: 7px;
   background: #d4d4d4;
   z-index: 2;
+  overflow: hidden;
+  border-radius: 5px;
 }
 .line .activeline{
   position: absolute;
   left: 0;
-  height: 3px;
+  height: 5px;
   top: 7px;
   background: #FB683C;
   z-index: 10;
+  overflow: hidden;
+  border-radius: 5px;
 }
 .line .num{
   display: block;
-  width: 36px;
-  font-size: 12px;
-  color: #444;
+  width: 60px;
+  font-size: 14px;
+  color: #FB683C;
   position: absolute;
   right: 0;
   top: 0;
@@ -252,7 +292,7 @@ export default {
 .view-wrapper{
   position: fixed;
   width: 100%;
-  top: 0;
+  top: 41px;
   left: 0;
   bottom: 50px;
   right: 0;
@@ -280,16 +320,17 @@ export default {
     color: #FB683C;
   }
    .list{
-    border-bottom: 0.5px solid #d4d4d4;
+    border-bottom: 1px solid #d4d4d4;
     padding-left: 15px;
     display: block;
     width: 100%;
     box-sizing:border-box;
+    background: #fff;
   }
   .list .item{
     width: 100%;
     padding: 15px 15px 15px 0;
-    border-bottom: 0.5px solid #d4d4d4;
+    border-bottom: 1px solid #d4d4d4;
     box-sizing:border-box;
   }
   .list .item:nth-last-child(1){

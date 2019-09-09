@@ -36,11 +36,10 @@ export default {
     width: 100%;
     box-sizing:border-box;
     padding: 0px 10px;
-    border-bottom: 0.5px solid #d4d4d4;
     line-height: 30px;
     height: 30px;
     overflow: hidden;
-    font-size: 12px;
+    font-size: 15px;
   }
   .base-title .title{
     float: left;
@@ -64,13 +63,14 @@ export default {
     color: #868686;
     position: relative;
     padding-right: 11px;
+    font-size: 12px;
   }
   .base-title .more:after{
     content: "";
     display: block;
     position: absolute;
-    width: 6px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     right: 0;
     top: 10px;
     background: url('./imgs/more.png') no-repeat center center;

@@ -16,6 +16,7 @@
     "cube-ui": "~1.12.15",
     "fastclick": "^1.0.6",
     "nprogress": "^0.2.0",
+    "vconsole": "^3.3.2",
     "vue": "^2.6.6",
     "vue-lazyload": "^1.2.6",
     "vue-router": "^3.0.1",

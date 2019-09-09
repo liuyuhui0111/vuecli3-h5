@@ -2,10 +2,7 @@ import Vue from 'vue';
 import Axios from 'axios';
 // import qs from 'qs';
 import store from './store';
-import {
-  replaceCode,
-} from '@/assets/utils/util';
-import COMMON_ENV from '@/config/env';
+
 
 const axios = Axios.create({
   timeout: 1000 * 60, // 超时时间60s
@@ -100,12 +97,10 @@ axios.interceptors.response.use(
             if(response.data.code === '0002' && store.getters.token){
               // 登录过期
               store.commit('setToken','');
+              vue.$message('登录状态过期，请稍后再试');
               // 退出登录
-              const REDIRECT_URI = encodeURIComponent(replaceCode());
-              window.localStorage.setItem('REDIRECT_URI', replaceCode());
-              const url = `/course_authentication/h5/logout?redirect_uri=${REDIRECT_URI}`;
-              window.location.replace(COMMON_ENV.SSO_URL + url);
-            }
+             }
+
             return response;
     },
     (error) => {

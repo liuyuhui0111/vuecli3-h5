@@ -24,13 +24,12 @@
             <template slot-scope="props"
             slot="title">
               <span :class="'classtype'+ props.item.type"
-              >({{props.item.type==2?'公开课':'线上课'}})
-              </span>
+              >{{props.item.type==2?'线下课':'线上课'}}</span>
               {{props.item.title}}
             </template>
             <template slot-scope="props"
             slot="onlineIntro">
-              <div class="col-box" :class="{mtop:props.item.type==2}">
+              <div class="col-box mtop">
                 <span class="money"
                 :class="{free:props.item.price==0}">
                 {{props.item.price==0?'免费':'￥'+props.item.price}}</span>
@@ -41,13 +40,15 @@
           </div >
 
         </div>
-        <div class="h80"></div>
+        <div v-if="list.length>14" class="h80"></div>
         <template slot="pullup" slot-scope="props">
           <div v-if="props.isPullUpLoad" class="tips">
             加载中...
           </div>
           <div v-else class="tips">
-            已经到底了~
+            <span v-show="list.length>14">
+              没有更多了~
+            </span>
           </div>
           </template>
       </cube-scroll>
@@ -78,7 +79,7 @@ export default {
       pullUpLoad: true,
       pullUpLoadThreshold: 100,
       pullUpLoadMoreTxt: '上拉加载',
-      pullUpLoadNoMoreTxt: '已经到底了~',
+      pullUpLoadNoMoreTxt: '没有更多了~',
       isShowBackTop: false, // 返回顶部
 
       saveMyCollectionParam: { // 取消收藏参数
@@ -116,7 +117,7 @@ export default {
     },
   },
   methods: {
-    init() {
+    async init() {
       this.pageNum = 1;
       this.total = 0;
       this.isShowPage = false;
@@ -193,13 +194,18 @@ export default {
       });
     },
 
-    saveMyCollectionFn(item) {
+    async saveMyCollectionFn(item) {
       // 收藏 如果未登录  提示去登陆
+      let confirm = await this.$confirm('确定要取消收藏该课程吗？');
+      if (!confirm) {
+        return;
+      }
       if (this.isCanRequest) {
         this.isCanRequest = false;
       } else {
         return;
       }
+
       this.saveMyCollectionParam.courseId = item.id;
       this.saveMyCollectionParam.onOffType = item.type === '2' ? 0 : 1;
 
@@ -242,7 +248,7 @@ export default {
 </script>
 <style scoped>
 .h80{
-  height: 80px;
+  height: 57px;
   display: block;
   position: relative;
   overflow: hidden;
@@ -253,7 +259,7 @@ export default {
   color: #868686;
   text-align: center;
   font-size: 12px;
-  padding: 30px 0;
+  padding: 7px 0 30px 0;
   height: 20px;
   line-height: 20px;
   position: absolute;
@@ -265,28 +271,46 @@ export default {
   color: #FB683C;
   margin-right: 3px;
   font-weight: bold;
+  font-size: 12px;
+  background: rgba(251,104,60,0.15);
+  border-radius: 3px;
+  text-align: center;
+  display: inline;
+  padding: 4px 8px;
 }
 .classtype2{
-  color: #659FE3;
+  color: #3C68FB;
+  background: rgba(60,104,251,0.15);
+}
+.col-box{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .col-box.mtop{
   overflow: hidden;
-  padding-top: 45px;
-
+  padding-top: 20px;
 }
 .col-box .col{
   float: right;
-  margin: -50px;
-  padding: 50px;
+  display: block;
+  width: 68px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  border: 1px solid #868686;
+  border-radius: 15px;
+  font-size: 12px;
 }
 .money{
-  color: #F91E1E;
-  font-size: 12px;
+  color: #FB683C;
+  font-size: 17px;
   font-weight: bold;
   float: left;
 }
 .money.free{
   color: #2DAF53;
+  font-weight: normal;
 }
 .view-wrapper{
   position: fixed;
@@ -319,17 +343,17 @@ export default {
     color: #FB683C;
   }
    .list{
-    border-bottom: 0.5px solid #d4d4d4;
+    border-bottom: 1px solid #d4d4d4;
     padding-left: 15px;
     display: block;
     width: 100%;
     box-sizing:border-box;
-
+    background: #fff;
   }
   .list .item{
     width: 100%;
     padding: 15px 15px 15px 0;
-    border-bottom: 0.5px solid #d4d4d4;
+    border-bottom: 1px solid #d4d4d4;
     box-sizing:border-box;
   }
   .list .item:nth-last-child(1){

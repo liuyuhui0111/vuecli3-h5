@@ -22,14 +22,14 @@ export default {
           index: 0,
         }, {
           text: '全部课程',
-          path: '/open-class',
+          path: '/online-class',
           index: 1,
         }, {
-          text: '最近在学',
+          text: '我的学习',
           path: '/center/myclass',
           index: 2,
         }, {
-          text: '我的',
+          text: '个人中心',
           path: '/center',
           index: 3,
         },
@@ -52,8 +52,12 @@ export default {
       this.curindex = -1;
       // 判断是否显示底部导航
       let { path } = this.$route;
-      if (path === '/online-class') {
-        path = '/open-class';
+      if (path === '/open-class') {
+        path = '/online-class';
+      }
+
+      if (path === '/center/offline') {
+        path = '/center/myclass';
       }
       this.list.forEach((item, index) => {
         if (item.path === path) {
@@ -68,11 +72,11 @@ export default {
 .foot-nav{
   position: fixed;
   width: 100%;
-  height: 48px;
+  height: 50px;
   background: #fff;
   bottom: 0;
   left: 0;
-  box-shadow: 0 -0.5px 0 0 #D4D4D4;
+  box-shadow: 0 -1px 0 0 #D4D4D4;
   display: flex;
   align-items: center;
   justify-content: space-around;

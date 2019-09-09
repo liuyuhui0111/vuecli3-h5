@@ -1,5 +1,6 @@
 <template>
     <div class="courseInfo_outer common-components-courseInfo">
+        <classTitle title="老师简介"></classTitle>
         <div class="head_outer">
             <div class="head-left">
                 <!--<img :src="detailData.headPic || detailData.teacherAvatar">-->
@@ -13,13 +14,11 @@
 
             </div>
         </div>
-        <!--课程信息tit start -->
-        <div v-if="detailData.teacherIntroduction" id="content0" class="tit_outer">
-            <div class="tit_content">
-                <b></b>
-                <span>课程信息</span>
-            </div>
+        <div class="re">
+            <span class="hash" id="content0"></span>
+            <classTitle v-if="detailData.teacherIntroduction" title="课程信息"></classTitle>
         </div>
+
         <!--课程信息tit end -->
         <div v-if="detailData.teacherIntroduction" class="information_outer">
             <span>课程天数: {{ getDay }}天</span>
@@ -30,41 +29,35 @@
             <span>咨询电话: {{ detailData.hotline }}</span>
         </div>
         <template v-if="detailData.introduce || detailData. courseBrief">
-        <!-- 课程介绍 -->
-        <div id="content1" class="tit_outer">
-            <div class="tit_content">
-                <b></b>
-                <span>课程介绍</span>
+            <!-- 课程介绍 -->
+            <div class="re">
+            <span class="hash" id="content1"></span>
+            <classTitle title="课程介绍"></classTitle>
             </div>
-        </div>
-        <div id="shareDesc" class="introduce_outer">
-            <span v-html="transferStringFn(detailData.introduce || detailData. courseBrief)">
-            </span>
-        </div>
-    </template>
+            <div id="shareDesc" class="introduce_outer">
+                <span v-html="transferStringFn(detailData.introduce || detailData. courseBrief)">
+                </span>
+            </div>
+        </template>
         <template v-if="detailData.outline || detailData.courseIncome">
-        <!-- 课程收益 -->
-        <div v-if="!detailData.teacherIntroduction" class="tit_outer">
-            <div class="tit_content">
-                <b></b>
-                <span>课程收益</span>
+            <classTitle v-if="!detailData.teacherIntroduction" title="课程收益"></classTitle>
+            <div v-if="!detailData.teacherIntroduction" class="introduce_outer">
+                <span
+                        v-html="transferStringFn(detailData.outline || detailData.courseIncome)">
+                </span>
             </div>
-        </div>
-        <div v-if="!detailData.teacherIntroduction" class="introduce_outer">
-            <span
-                    v-html="transferStringFn(detailData.outline || detailData.courseIncome)">
-
-            </span>
-        </div>
         </template>
 
         <template v-if="detailData.outline || detailData.courseOutline">
-        <!-- 课程大纲 -->
-            <div id="content2" class="tit_outer">
-                <div class="tit_content">
-                    <b></b>
-                    <span>课程大纲</span>
-                </div>
+            <!-- 课程大纲 -->
+             <div class="re">
+            <span class="hash" id="content2"></span>
+
+            <classTitle
+                    v-if="detailData.teacherIntroduction"
+                    title="课程大纲">
+
+            </classTitle>
             </div>
             <div class="introduce_outer">
                 <span
@@ -73,16 +66,16 @@
             </div>
         </template>
         <template v-if="detailData.plan">
-        <!-- 课程计划 -->
-        <div v-if="detailData.teacherIntroduction" id="content3" class="tit_outer">
-            <div class="tit_content">
-                <b></b>
-                <span>课程计划</span>
+        <div class="re">
+            <span class="hash" id="content3"></span>
+            <classTitle
+                    v-if="detailData.teacherIntroduction"
+                    title="课程计划">
+            </classTitle>
+        </div>
+            <div v-if="detailData.teacherIntroduction" class="introduce_outer">
+                <span v-html="transferStringFn(detailData.plan)"></span>
             </div>
-        </div>
-        <div v-if="detailData.teacherIntroduction" class="introduce_outer">
-            <span v-html="transferStringFn(detailData.plan)"></span>
-        </div>
         </template>
 
     </div>
@@ -114,14 +107,7 @@ export default {
 
   },
   methods: {
-    // aClick(id) {
-    //   let a = document.createElement('a');
-    //   let href = `#content${id}`;
-    //   a.setAttribute('href', href);
-    //   document.body.appendChild(a);
-    //   a.click();
-    //   a.remove();
-    // },
+
     transferStringFn(str) {
       return transferString(str);
     },
@@ -137,15 +123,33 @@ export default {
 };
 </script>
 <style>
-    .common-components-courseInfo img{
+    .common-components-courseInfo img {
         width: 100%;
     }
-    .common-components-courseInfo p{
+
+    .common-components-courseInfo p {
         line-height: 1.5;
+        color: #868686;
     }
+    .common-components-courseInfo p span{
+        line-height: 1.5;
+        color: #868686!important;
+        font-family: 'PingFangSC-Medium','Avenir', Helvetica, Arial, sans-serif!important;
+    }
+
+    /*.common-components-courseInfo .head-right span p span{*/
+    /*font-size: 100%!important;*/
+    /*}*/
 </style>
 
 <style lang="less" scoped>
+    .re{
+        position: relative;
+    }
+    .re .hash{
+        position: absolute;
+        top:-60px;
+    }
     .courseInfo_outer {
         width: 100%;
         height: 100%;
@@ -155,35 +159,38 @@ export default {
             box-sizing: border-box;
         }
         .head_outer {
+            background-color: #fff;
             width: 100%;
             /*display: flex;*/
             padding: 10px 15px;
             .head-left {
-                width: 60px;
-                height: 60px;
-                max-width: 60px;
+                width: 44px;
+                height: 44px;
+                max-width: 44px;
                 float: left;
                 border-radius: 50%;
                 overflow: hidden;
                 img {
-                    width: 60px;
-                    height: 60px;
-                    max-width: 60px;
+                    width: 44px;
+                    height: 44px;
+                    max-width: 44px;
                 }
             }
             .head-right {
-                width: calc(100% - 70px);
-                margin-left: 70px;
+                width: calc(100% - 54px);
+                margin-left: 54px;
                 font-size: 14px;
                 span {
                     display: block;
-                    color: #444;
+                    color: #868686;
                     line-height: 20px;
                     word-wrap: break-word;
                 }
                 .tit {
-                    font-weight: 600;
+                    /*font-weight: 600;*/
                     margin-bottom: 10px;
+                    font-size: 14px;
+                    color: #444;
                 }
             }
         }
@@ -213,22 +220,27 @@ export default {
 
         }
         .information_outer {
+            background-color: #fff;
             width: 100%;
-            padding: 0 15px;
+            padding: 10px 15px;
             span {
                 margin-top: 10px;
                 font-size: 14px;
                 display: block;
-                color: #444;
+                color: #868686;
+                &:nth-child(1) {
+                    margin-top: 0;
+                }
             }
         }
         .introduce_outer {
             width: 100%;
             padding: 10px 15px;
+            background-color: #fff;
             span {
                 line-height: 1.5;
                 font-size: 14px;
-                color: #444;
+                color: #868686;
                 p {
                     line-height: 20px;
                 }

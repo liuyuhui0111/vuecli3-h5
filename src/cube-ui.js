@@ -11,20 +11,20 @@ import {
   Loading,
   Tip,
   // Toolbar,
-  // TabBar,
-  // TabPanels,
+  TabBar,
+  TabPanels,
   // form==============表单
-  // Checkbox,
-  // CheckboxGroup,
-  // Checker,
-  // Radio,
-  // RadioGroup,
-  // Input,
-  // Textarea,
+  Checkbox,
+  CheckboxGroup,
+  Checker,
+  Radio,
+  RadioGroup,
+  Input,
+  Textarea,
   // Select,
   // Switch,
   // Rate,
-  // Validator,
+  Validator,
   // Upload,
   // Form,
   // popup==================弹窗
@@ -38,7 +38,7 @@ import {
   Dialog,
   // ActionSheet,
   // Drawer,
-  // ImagePreview,
+  ImagePreview,
   // scroll==============滚动
   Scroll,
   // RecycleList,
@@ -56,19 +56,19 @@ Vue.use(Toast);
 Vue.use(Loading);
 Vue.use(Tip);
 // Vue.use(Toolbar);
-// Vue.use(TabBar);
-// Vue.use(TabPanels);
-// Vue.use(Checkbox);
-// Vue.use(CheckboxGroup);
-// Vue.use(Checker);
-// Vue.use(Radio);
-// Vue.use(RadioGroup);
-// Vue.use(Input);
-// Vue.use(Textarea);
+Vue.use(TabBar);
+Vue.use(TabPanels);
+Vue.use(Checkbox);
+Vue.use(CheckboxGroup);
+Vue.use(Checker);
+Vue.use(Radio);
+Vue.use(RadioGroup);
+Vue.use(Input);
+Vue.use(Textarea);
 // Vue.use(Select);
 // Vue.use(Switch);
 // Vue.use(Rate);
-// Vue.use(Validator);
+Vue.use(Validator);
 // Vue.use(Upload);
 // Vue.use(Form);
 // Vue.use(Popup);
@@ -81,7 +81,7 @@ Vue.use(Tip);
 Vue.use(Dialog);
 // Vue.use(ActionSheet);
 // Vue.use(Drawer);
-// Vue.use(ImagePreview);
+Vue.use(ImagePreview);
 Vue.use(Scroll);
 Vue.use(Slide);
 // Vue.use(IndexList);

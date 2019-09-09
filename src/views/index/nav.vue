@@ -17,12 +17,12 @@ export default {
       navlist: [
         {
           icon: 'icon-online',
-          title: '在线课程',
+          title: '线上课',
           path: '/online-class',
         },
         {
           icon: 'icon-offline',
-          title: '财税公开课',
+          title: '线下课',
           path: '/open-class',
         },
       ],

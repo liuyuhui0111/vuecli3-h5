@@ -21,43 +21,43 @@
         <div v-for="(item,index) in list" class="item"
         :key="index">
           <div class="tel">
-            {{item.signUp.substr(0,item.signUp.length-3)}} 预约手机号：{{item.phone}}
+            报名时间：{{item.signUp.substr(0,item.signUp.length-3)}} &nbsp;&nbsp;手机号：{{item.phone}}
           </div>
           <ClassCard @cardClick="cardClick"
           :item="item" page="list">
           <template slot-scope="props"
           slot="onlineIntro">
             <div class="col-box">
+              <span v-if="props.item.tkm" class="tkm">听课凭借码：<i>{{props.item.tkm}}</i></span>
               <span class="money"
               :class="{free:props.item.price==0}">
               {{props.item.price==0?'免费':'￥'+props.item.price}}</span>
             </div>
           </template>
           </ClassCard>
-
+          <div class="address">
+            上课地点：{{item.address}}
+          </div>
           <div class="time">
             上课时间：
             {{item.startTime.substr(0,item.startTime.length-3)}}
             ~
             {{item.endTime.substr(0,item.endTime.length-3)}}
           </div>
-          <div class="address">
-            上课地点：{{item.address}}
-          </div>
-          <div class="address">
-            听&ensp;课&ensp;码：{{item.tkm?item.tkm:'----'}}
-          </div>
+
 
         </div >
 
         </div>
         <template slot="pullup" slot-scope="props">
-        <div class="h80"></div>
+        <div v-if="list.length>14" class="h80"></div>
         <div v-if="props.isPullUpLoad" class="tips">
           加载中...
         </div>
         <div v-else class="tips">
-          已经到底了~
+          <span v-show="list.length>14">
+            没有更多了~
+          </span>
         </div>
         </template>
       </cube-scroll>
@@ -87,7 +87,7 @@ export default {
       pullUpLoad: true,
       pullUpLoadThreshold: 100,
       pullUpLoadMoreTxt: '上拉加载',
-      pullUpLoadNoMoreTxt: '已经到底了~',
+      pullUpLoadNoMoreTxt: '没有更多了~',
       isShowBackTop: false, // 返回顶部
     };
   },
@@ -199,7 +199,7 @@ export default {
 </script>
 <style scoped>
 .h80{
-  height: 80px;
+  height: 57px;
   display: block;
   position: relative;
   overflow: hidden;
@@ -210,7 +210,7 @@ export default {
   color: #868686;
   text-align: center;
   font-size: 12px;
-  padding: 30px 0;
+  padding: 7px 0 30px 0;
   height: 20px;
   line-height: 20px;
   position: absolute;
@@ -220,12 +220,30 @@ export default {
 .address,
 .tel{
   font-size: 12px;
-  margin: 5px 0;
-}
-.time,
-.address{
   color: #868686;
+  line-height: 20px;
+  position: relative;
 }
+.tel{
+  padding-bottom: 15px;
+  border-bottom: 1px solid #d8d8d8;
+  margin-bottom: 15px;
+  font-size: 13px;
+  color: #444444;
+}
+.address{
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+.time,.address{
+  padding-left: 20px;
+  background: url('./imgs/icon-address.png') no-repeat left center;
+  background-size: 15px 15px;
+}
+.time{
+  background-image: url('./imgs/icon-date.png');
+}
+
 .classtype2,
 .classtype1{
   color: #FB683C;
@@ -237,16 +255,27 @@ export default {
 }
 .col-box{
   overflow: hidden;
-  padding-top: 45px;
+  overflow: hidden;
+  line-height: 20px;
+  vertical-align: center;
+  padding-top: 15px;
 }
-.col-box .col{
-  float: right;
+
+.col-box .tkm{
+  font-size: 12px;
+  color: #444;
+}
+.col-box .tkm i{
+  font-size: 16px;
+  color: #FB683C;
+  font-weight: bold;
+  position: relative;
+  top: 1px;
 }
 .money{
-  color: #F91E1E;
-  font-size: 12px;
-  font-weight: bold;
-  float: left;
+  color: #444;
+  font-size: 13px;
+  float: right;
 }
 .money.free{
   color: #2DAF53;
@@ -271,7 +300,7 @@ export default {
     height: 50px;
     border-radius: 4px;
     margin: 0 auto;
-    background: url('./imgs/icon-empty.png') no-repeat center center;
+    background: url('./imgs/offline-empty.png') no-repeat center center;
     background-size: 50px 50px;
   }
   .empty p{
@@ -282,16 +311,16 @@ export default {
     color: #FB683C;
   }
    .list{
-    border-bottom: 0.5px solid #d4d4d4;
-    padding-left: 15px;
+
     display: block;
     width: 100%;
     box-sizing:border-box;
+    background: #fff;
   }
   .list .item{
+    border-top: 7px solid #f1f1f1;
     width: 100%;
-    padding: 15px 15px 15px 0;
-    border-bottom: 0.5px solid #d4d4d4;
+    padding: 15px;
     box-sizing:border-box;
   }
   .list .item:nth-last-child(1){

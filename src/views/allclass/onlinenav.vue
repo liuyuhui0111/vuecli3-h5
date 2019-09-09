@@ -1,8 +1,12 @@
 <template>
   <div class="online-nav">
+    <div class="nav">
     <div v-for="(item,index) in list"
     class="item ellipsis"
-    :class="{active:listIndex == index}"
+    :class="[
+    {active:listIndex == index},
+    {checked:checkList[index]}
+    ]"
     @click="changeNav(index)"
     :key="index">
       <span>{{
@@ -10,6 +14,7 @@
                 ? item.text.substr(0,4)+'...'
                 : item.text
       }}</span>
+    </div>
     </div>
     <div v-show="listIndex==0" class="show-box">
     <!-- 方向专业 -->
@@ -43,7 +48,7 @@
         </div>
       </div>
     </div>
-    <div v-show="listIndex==1" class="show-box">
+    <div v-show="listIndex==1" class="show-box auto">
     <!-- 价格 -->
       <div v-for="(item,index) in pricelist"
       :class="{active:item.value === list[1].value}"
@@ -53,7 +58,7 @@
         {{item.text}}
       </div>
     </div>
-    <div v-show="listIndex==2" class="show-box">
+    <div v-show="listIndex==2" class="show-box auto">
     <!-- 类型 -->
       <div v-for="(item,index) in typelist"
       :class="{active:item.value === list[2].value}"
@@ -63,7 +68,7 @@
         {{item.text}}
       </div>
     </div>
-    <div v-show="listIndex==3" class="show-box">
+    <div v-show="listIndex==3" class="show-box auto">
     <!-- 热度 -->
     <div v-for="(item,index) in hotlist"
       :class="{active:item.value === list[3].value}"
@@ -84,6 +89,7 @@ export default {
     return {
       listIndex: -1,
       isShowMark: false,
+      checkList: [false, false, false, false, false],
       list: [
         {
           text: '方向专业',
@@ -222,6 +228,8 @@ export default {
       // 选中选项
       this.list[this.listIndex].text = item.text;
       this.list[this.listIndex].value = item.value;
+      this.checkList[this.listIndex] = true;
+      console.log(this.checkList);
       this.listIndex = -1;
       this.isShowMark = false;
       this.emit('changeNav', this.list);
@@ -262,6 +270,8 @@ export default {
         this.list[this.listIndex].text = this.secondList[index].name;
         this.list[this.listIndex].value2 = this.secondList[index].id;
       }
+      this.checkList[this.listIndex] = true;
+      console.log(this.checkList);
       this.listIndex = -1;
       this.isShowMark = false;
       this.emit('changeNav', this.list);
@@ -272,18 +282,22 @@ export default {
 <style scoped>
 .online-nav{
   width: 100%;
-  height: 36px;
+  position: relative;
+}
+.online-nav .nav{
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-sizing:border-box;
-  padding:0 30px 0 15px;
+  /* border-bottom: 1px solid #d8d8d8; */
+  background: #fff;
 }
 .online-nav .item{
-  text-align: center;
-  font-size: 0;
-  max-width: 25%;
-  overflow: hidden;
+  display: flex;
+  width: 25%;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
 }
 .online-nav .item span{
   padding-right: 16px;
@@ -303,8 +317,12 @@ export default {
   right: 0;
   top: 16px;
 }
+.online-nav .item.checked,
 .online-nav .item.active{
   color: #FB683C;
+}
+.online-nav .item.checked span:after{
+  background-image: url('./imgs/icon-tran-checked.png');
 }
 .online-nav .item.active span:after{
   background-image: url('./imgs/icon-tran-active.png');
@@ -312,20 +330,22 @@ export default {
 .show-box{
   position: absolute;
   width: 100%;
-  height: auto;
+  height: 320px;
   top: 36px;
   z-index: 101;
   background: #fff;
-  max-height: 310px;
   overflow-y: auto;
-  border-top: 0.5px solid #d4d4d4;
   left: 0;
   overflow: hidden;
+  color: #444444;
+}
+.online-nav .auto{
+  height:auto;
 }
 .bg{
   position: absolute;
   background: #F1F1F1;
-  width: 89px;
+  width: 25%;
   height: 100%;
   left: 0;
   top: 0;
@@ -333,32 +353,42 @@ export default {
   z-index: -1;
 }
 .show-box .fl{
-  width: 89px;
+  width: 25%;
   height: 100%;
-  max-height: 310px;
   overflow-y: auto;
   float: left;
+
 }
 .show-box .fr{
-  width: 271px;
+  width: 75%;
   height: 100%;
   float: left;
-  max-height: 310px;
   overflow-y: auto;
 }
 .show-box .fl .active{
   background: #fff;
 }
 .show-box .ellipsis{
-  height: 31px;
-  line-height: 31px;
-  font-size: 12px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 13px;
   padding-left: 15px;
   box-sizing:border-box;
   overflow: hidden;
+  position: relative;
+  border-top: 1px solid #d8d8d8;
 }
 .show-box .ellipsis.active{
   color: #FB683C;
+}
+.show-box .fl .ellipsis.active:before{
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 44px;
+  left: 0;
+  top: 0;
+  background: #FB683C;
 }
 .mask{
   width: 100%;

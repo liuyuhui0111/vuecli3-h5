@@ -8,11 +8,12 @@ baseProxyUrl = process.env.NODE_ENV === 'development' ? process.env.VUE_APP_URL 
 
 let proxyData = {
     'http://test.5ifapiao.com:8888': [
-        // '/fatscourse',
+        '/fatscourse',
         '/ele-myinvoice', '/course_authentication', '/course_api-gateway'
     ], //分享
-    'http://10.1.28.167:9983': ['/fatscourse'],
+    // 'http://10.1.28.167:9983': ['/fatscourse'],
     // 'http://10.1.28.153:9983': ['/fatscourse'],
+    // 'http://10.1.30.214:9983': ['/fatscourse'],
 };
 
 let proxy = {};
@@ -83,3 +84,4 @@ module.exports = {
 // http://10.1.31.140  陈埼
 // 10.1.28.167:9983  赵聪
 // http://10.1.29.53:9983  梁玉欢
+// 17128240164  dxhy0328  http://test.5ifapiao.com:8888/mcourse-430100006

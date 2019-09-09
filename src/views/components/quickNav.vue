@@ -55,7 +55,7 @@ export default {
 .quick_nav{
     position: fixed;
     top: 59%;
-    right: 5px;
+    right: 0px;
     z-index: 9999;
     transition: all .2s cubic-bezier(.645,.045,.355,1);
     div {
@@ -63,31 +63,50 @@ export default {
     }
     .quick_nav_outer{
         width: 30px;
-        height: 30px;
+        height: 44px;
         transition: all .2s cubic-bezier(.645,.045,.355,1);
         position: relative;
-        background-color: rgba(0,0,0,.8);
-
+        background-color: #fff;
+        box-shadow: 0 4px 14px 0 rgba(0,0,0,0.20);
         /*background: url("imgs/juxing2121213.png");*/
         /*-webkit-background-size: 100% 100%;*/
         /*background-size: 100% 100%;*/
 
-        border-radius: 100px;
+        border-radius: 8px 0 0 8px;
         overflow: hidden;
         &.active{
-            width: 136px;
+            width: 176px;
             transition: all .2s cubic-bezier(.645,.045,.355,1);
 
             /*border-radius: 0;*/
             /*overflow: visible;*/
             .item_list{
-                padding-left: 10px;
+                padding-left: 0;
+            }
+            .icon-head{
+                width: 20px;
+                height: 20px;
+                top: 12px;
+                right: 10px;
+                box-sizing: content-box;
+                background: url("imgs/guanbi.png") no-repeat;
+                -webkit-background-size: 100% 100%;
+                background-size: 100% 100%;
+                &::before{
+                    content: '';
+                    width: 1px;
+                    height: 20px;
+                    position: absolute;
+                    right: 30px;
+                    top: 0;
+                    background: rgb(203,203,203);
+                }
             }
         }
         .icon-head{
             width: 30px;
-            height: 30px;
-            background: url("imgs/fenzu754545454545.png");
+            height: 44px;
+            background: url("imgs/moren.png") no-repeat;
             -webkit-background-size: 100% 100%;
             background-size: 100% 100%;
             position: absolute;
@@ -97,11 +116,12 @@ export default {
 
         .item_list{
             width: 100%;
-            padding-right: 30px;
-            padding-left: 30px;
-            color: #fff;
+            height: 100%;
+            padding: 5px 40px;
+            color: #444;
             display: flex;
             overflow: hidden;
+            align-items: center;
             transition: all .2s cubic-bezier(.645,.045,.355,1);
             .item{
                 flex: 1;
@@ -118,17 +138,17 @@ export default {
                     height: 20px;
                 }
                 .icon-home{
-                    background: url("imgs/fenzu78787767.png") no-repeat center;
+                    background: url("imgs/shouye.png") no-repeat center;
                     -webkit-background-size: 100%;
                     background-size: 100%;
                 }
                 .icon-all{
-                    background: url("imgs/fenzu32323234.png") no-repeat center;
+                    background: url("imgs/quanbukecheng.png") no-repeat center;
                     -webkit-background-size: 100%;
                     background-size: 100%;
                 }
                 .icon-me{
-                    background: url("imgs/fenzu·2·2·2·1.png") no-repeat center;
+                    background: url("imgs/me.png") no-repeat center;
                     -webkit-background-size: 100%;
                     background-size: 100%;
                 }
@@ -137,6 +157,8 @@ export default {
                     -webkit-text-size-adjust:none;
                     white-space: nowrap;
                     transform: scale(0.7);
+                    margin-top: 3px;
+                    color: #444;
                 }
             }
         }

@@ -19,6 +19,8 @@ import {
 } from '@/assets/utils/util';
 import baseImg from '@/views/components/img.vue';
 import BackTop from '@/views/components/backtop.vue';
+import classTitle from '@/views/components/classTitle.vue';
+import myBtn from '@/views/components/myButton.vue';
 import {
   wxConfig,
 } from '@/assets/utils/wxFunction';
@@ -36,6 +38,8 @@ export default {
           wxShareDesc: '', // 分享描述
           isCanRequest: true, // 防止重复请求
           scrollInitHeight: 700,
+          qimoChatTimer: null,
+
         };
       },
       watch: {
@@ -53,6 +57,8 @@ export default {
       components: {
         BackTop,
         baseImg,
+        classTitle,
+        myBtn,
       },
       computed: {
         ...mapGetters([
@@ -63,6 +69,10 @@ export default {
           'netWorkError',
           'requestLoading',
           'fromRoute',
+          'isqimoChatClickFlag',
+          'vuexInvoiceData',
+          'vuexInvoiceTitle',
+          'orderData',
         ]),
       },
       methods: {
@@ -75,6 +85,27 @@ export default {
             type: type || 'txt',
           }).show();
         },
+        $confirm(mes) {
+          // 确认弹窗
+          return new Promise((resolve) => {
+            this.$createDialog({
+              type: 'confirm',
+              title: mes,
+              confirmBtn: {
+                text: '确定',
+              },
+              cancelBtn: {
+                text: '取消',
+              },
+              onConfirm: () => {
+                resolve(true);
+              },
+              onCancel: () => {
+                resolve(false);
+              },
+            }).show();
+          });
+        },
 
         login(type) {
           // 去登录
@@ -82,43 +113,44 @@ export default {
           goLogin(type);
         },
 
-        loginoutFn(flag) {
+        async loginoutFn(flag) {
           // 退出登录，清空cookie
           if (flag === true) {
             // flag true 直接登录 不弹窗
             loginout();
             return;
           }
-          let oThis = this;
-          this.$createDialog({
-            type: 'confirm',
-            title: '提示',
-            content: '确定退出登录吗？',
-            confirmBtn: {
-              text: '确定',
-            },
-            cancelBtn: {
-              text: '取消',
-            },
-            onConfirm: () => {
-              oThis.setToken('');
-              window.localStorage.removeItem('REDIRECT_URI');
-              this.$nextTick(() => {
-                loginout();
-              });
-            },
-            onCancel: () => {
-              console.log('取消');
-            },
-          }).show();
+          let res = await this.$confirm('确定退出登录吗？');
+          if (!res) {
+            return;
+          }
+
+          this.setToken('');
+          window.localStorage.removeItem('REDIRECT_URI');
+          loginout();
         },
-        cardClick(item) {
+        cardClick(item, index, type) {
+          if (type === 1) {
+            this.ysxy_columnClick({ LocationName: `公开课${index + 1}`, columnTitle: '线下公开课程' });
+          } else if (type === 2) {
+            this.ysxy_columnClick({ LocationName: `大家都在学${index + 1}`, columnTitle: '大家都在学' });
+          } else if (type === 3) {
+            this.ysxy_columnClick({ LocationName: `新鲜出炉${index + 1}`, columnTitle: '新鲜出炉' });
+          } else if (type === 4) {
+            this.ysxy_columnClick({ LocationName: `推荐课程${index + 1}`, columnTitle: '推荐课程' });
+          }
+          let opt = {
+            cid: item.id,
+          };
+          if (type) {
+            opt.fromRoute = `index${type}`;
+          }
           // 点击跳转详情
           /*eslint-disable*/
           if(item.type == '2'){
-            this.routerGo('/detail',{cid:item.id});
+            this.routerGo('/detail',opt);
           }else if(item.type == '1'){
-            this.routerGo('/online-detail',{cid:item.id});
+            this.routerGo('/online-detail',opt);
           }
           /* eslint-enable */
         },
@@ -187,6 +219,20 @@ export default {
           let query = q || {};
           this.$router.push({ path, query });
         },
+        qimoChatClickFn() {
+          // 唤起客服
+          if (this.isqimoChatClickFlag) {
+            window.qimoChatClick();
+          } else {
+            this.qimoChatTimer = setInterval(() => {
+              console.log('check chat');
+              if (this.isqimoChatClickFlag) {
+                window.qimoChatClick();
+                clearInterval(this.qimoChatTimer);
+              }
+            }, 20);
+          }
+        },
         emit(eventname, data) {
           // 派发事件
           this.$emit(eventname, data);
@@ -194,15 +240,17 @@ export default {
 
         initWxShareFn() {
           /*eslint-disable*/
+
           // 微信分享
           this.wxShareTitle = this.$route.meta.wxShareTitle
        || '优税学院';
           this.wxShareDesc = this.$route.meta.wxShareDesc || '财税大神进阶之路，职业发展更快一步';
+
           this.wxShareUrl = window.location.href;
           this.wxShareImage = `${window.location.origin + this.publicPath}sharelogo.png`;
           this.wxShareFn();
         },
-        wxShareFn() {
+        wxShareFn(sucFn) {
           // 设置分享标题 图片 描述 地址
           // alert("分享链接："+this.wxShareUrl)
           let oThis = this;
@@ -214,6 +262,7 @@ export default {
             success: function (res) {
               // 用户确认分享后执行的回调函数
               // this.$message('分享成功');
+              sucFn && sucFn();
               oThis.$createDialog({
                 type: 'alert',
                 title: '提示',
@@ -233,6 +282,7 @@ export default {
               }).show();
             }
           }
+          // shareStart(wxShareData);
           // console.log(wxShareData);
           // alert('当前location:::'+location.href.split('#')[0]+'第一次请求接口url:::'+params.url)
           if(!getSystem().wx){
@@ -254,9 +304,15 @@ export default {
           'setNetWork',
           'setLoading',
           'setFromRoute',
+          'setIsqimoChatClickFlag',
         ]),
         ...mapMutations('user', [
           'setUsers',
+        ]),
+        ...mapMutations('order', [
+          'setVuexInvoiceData',
+          'setvuexInvoiceTitle',
+          'setOrderData',
         ]),
       },
     });

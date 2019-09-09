@@ -42,6 +42,7 @@ const routes = [{
     isHideQuickNav: true,
     keepAlive: true,
     wxShareTitle: '优税学院-全部课程',
+    fromRoute: '最近学习-线上课',
   },
   view: () => import(/* webpackChunkName: "group-index" */ '@/views/allclass/online.vue'),
 }, {
@@ -52,8 +53,14 @@ const routes = [{
     isHideQuickNav: true,
     keepAlive: true,
     wxShareTitle: '优税学院-全部课程',
+    fromRoute: '最近学习-线下课',
   },
   view: () => import(/* webpackChunkName: "group-index" */ '@/views/allclass/offline.vue'),
+}, {
+  title: '全部权益课程',
+  name: '/vipclass',
+  path: '/vipclass',
+  view: () => import(/* webpackChunkName: "group-index" */ '@/views/allclass/vipclass.vue'),
 }, {
   title: '在线报名',
   name: 'signup',
@@ -65,7 +72,7 @@ const routes = [{
   path: '/success',
   view: () => import(/* webpackChunkName: "group-detail" */ '@/views/openCourses/success.vue'),
 }, {
-  title: '最近学习',
+  title: '我的学习',
   name: 'centerMyclass',
   path: '/center/myclass',
   meta: {
@@ -74,7 +81,16 @@ const routes = [{
   },
   view: () => import(/* webpackChunkName: "group-index" */ '@/views/learnlist/index.vue'),
 }, {
-  title: '我的',
+  title: '我的学习',
+  name: '/center/offline',
+  path: '/center/offline',
+  meta: {
+    isHideQuickNav: true,
+    isNeedLogin: true, // 登录拦截
+  },
+  view: () => import(/* webpackChunkName: "group-index" */ '@/views/learnlist/offline.vue'),
+}, {
+  title: '个人中心',
   name: 'center',
   path: '/center',
   meta: {
@@ -83,15 +99,15 @@ const routes = [{
   },
   view: () => import(/* webpackChunkName: "group-index" */ '@/views/mycenter/index.vue'),
 },
-// {
-//   title: '我的订单',
-//   name: 'centerMyorder',
-//   path: '/center/myorder',
-//   meta: {
-//     isNeedLogin: true, // 登录拦截
-//   },
-//   view: () => import(/* webpackChunkName: "group-my" */ '@/views/mycenter/myorder.vue'),
-// },
+{
+  title: '我的订单',
+  name: 'centerMyorder',
+  path: '/center/myorder',
+  meta: {
+    isNeedLogin: true, // 登录拦截
+  },
+  view: () => import(/* webpackChunkName: "group-my" */ '@/views/mycenter/myorder.vue'),
+},
 {
   title: '我的收藏',
   name: 'centerMycol',
@@ -108,5 +124,69 @@ const routes = [{
     isNeedLogin: true, // 登录拦截
   },
   view: () => import(/* webpackChunkName: "group-my" */ '@/views/mycenter/mysigin.vue'),
-}];
+},
+{
+  title: '续费会员',
+  name: '/center/preson',
+  path: '/center/preson',
+  meta: {
+    isNeedLogin: true, // 登录拦截
+  },
+  view: () => import(/* webpackChunkName: "group-my" */ '@/views/mycenter/myorder.vue'),
+},
+
+{
+  title: '订单支付',
+  name: '/order',
+  path: '/order',
+  meta: {
+    isNeedLogin: true, // 登录拦截
+    isHideQuickNav: true,
+  },
+  view: () => import(/* webpackChunkName: "group-order" */ '@/views/order/index.vue'),
+},
+{
+  title: '订单支付',
+  name: '/pay-order',
+  path: '/pay-order',
+  meta: {
+    isNeedLogin: true, // 登录拦截
+    isHideQuickNav: true,
+  },
+  view: () => import(/* webpackChunkName: "group-order" */ '@/views/order/pay.vue'),
+},
+{
+  title: '支付成功',
+  name: '/order/success',
+  path: '/order/success',
+  meta: {
+    isNeedLogin: true, // 登录拦截
+    isHideQuickNav: true,
+  },
+  view: () => import(/* webpackChunkName: "group-order" */ '@/views/order/success.vue'),
+},
+{
+  title: '请填写发票信息',
+  name: '/invoice',
+  path: '/invoice',
+  meta: {
+    keepAlive: true,
+    isNeedLogin: true, // 登录拦截
+    isHideQuickNav: true,
+  },
+  view: () => import(/* webpackChunkName: "group-order" */ '@/views/order/invoice.vue'),
+},
+{
+  title: '会员剩余权益',
+  name: '/residualEquity',
+  path: '/residualEquity',
+  meta: {
+    keepAlive: true,
+    isNeedLogin: true, // 登录拦截
+    isHideQuickNav: true,
+  },
+  view: () => import(/* webpackChunkName: "group-order" */ '@/views/vipInfo/residualEquity.vue'),
+},
+
+];
 export default routes;

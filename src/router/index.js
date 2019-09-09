@@ -15,6 +15,9 @@ import {
   loginout,
 } from '@/api/apis';
 import {COMMON_REPLACE_URL,getUrlParam} from '@/assets/utils/util'
+// vconsole 调试工具
+import vConsole from 'vconsole'
+Vue.prototype.$vConsole= vConsole;
 Vue.use(Router);
 
 
@@ -69,13 +72,17 @@ let router = new Router({
   routes: routes
 });
 router.beforeEach(async (to, from, next) => {
+  if(getUrlParam('vConsole')=='1' || process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'){
+    new Vue.prototype.$vConsole();
+  }
+
   if(getUrlParam(COMMON_REPLACE_URL)){
     //COMMON
     replaceFn();
     return;
   }
   NProgress.start();
-  store.commit('setFromRoute',from.path);
+  store.commit('setFromRoute',from.meta.fromRoute || from.meta.title);
   if (getUrlParam('token')) {
     // 免密登录
     if(!store.getters.token){
@@ -97,6 +104,9 @@ router.beforeEach(async (to, from, next) => {
 
       if (to.meta.loginBackPath) {
         // 如果配置了登录回退页，跳转到该页面 否则去登录页
+        if(from.path === to.meta.loginBackPath){
+          NProgress.done();
+        }
         next({ path: to.meta.loginBackPath });
       } else {
         goLogin('login',to.fullPath);
@@ -113,24 +123,47 @@ router.beforeEach(async (to, from, next) => {
           next();
         }
       }else{
-        // 获取token失败直接去登录
-        goLogin('login',to.fullPath);
+        // 获取token失败退出登录再试
+        loginout();
       }
     }
     return;
+  }
+  if (!store.getters.token && getUrlParam('code')) {
+    // 获取token  下一周期 执行init
+    let res = await getToken({code:getUrlParam('code')});
+    if(res.data.code === 0){
+      let token = res.data.data['access_token'];
+      store.commit('setToken',token);
+      let userRes = await getUserInfo();  //获取用户信息
+      if (userRes.data.code === '0000') {
+        setUserFn(userRes);
+      }
+    }
   }
   next();
 })
 
 router.afterEach(async (to, from) => {
+
   if(document.title != to.meta.title){
     document.title = to.meta.title || ''
   }
-  if (!to.meta.isHideShare) {
-    // 如果不需要隐藏微信分享 调用微信分享
-    vue.initWxShareFn();
-  }
   NProgress.done();
+  vue.$nextTick(()=>{
+    console.log(to);
+    if (!to.meta.isHideShare) {
+      // 如果不需要隐藏微信分享 调用微信分享
+      vue.initWxShareFn();
+    }
+    // if(store.getters.token){
+    //   window.sensors.login(store.getters.token);
+    // }
+    // window.sensors.track('frompath',{"frompath":from.fullPath,"topath":to.fullPath});
+    window.sensors.quick('autoTrackSinglePage',{
+      platForm:'h5'
+    });
+  });
 })
 
 function replaceFn(){

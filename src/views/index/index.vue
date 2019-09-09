@@ -5,12 +5,13 @@
     :scrollEvents="['scroll-end']"
     @scroll-end="scroll">
     <!-- logo -->
-    <div @click="initWxShareFn()" class="logo">
-      <baseImg
-      :width="135"
-      :height="46"
-      :src="COMMON_COMP_DATA.logoUrl">
-      </baseImg>
+    <div class="white">
+    <div class="logo">
+      <img :src="COMMON_COMP_DATA.logoUrl" alt="">
+      <span>
+        {{ COMMON_COMP_DATA.productName }}
+      </span>
+    </div>
     </div>
     <!-- banner -->
     <div v-if="bannerList.length>0" class="banner-box">
@@ -23,16 +24,25 @@
       <div class="nav-box">
         <IndexNav @navclick="navclick"></IndexNav>
       </div>
+
+      <img @click="routerGo('/interests')" src="./imgs/viptip.png" alt="" class="viptip">
+
       <!-- 线下公开课 -->
       <div v-if="showCourseOfflineList.length>0" class="card offline">
-        <BaseTitle title="线下公开课"
+        <BaseTitle title="线下课"
         @moreclick="moreclick"
         moreurl="0"></BaseTitle>
+        <div class="pl15">
         <div v-for="(item,index) in showCourseOfflineList"
         class="item"
         :key="index">
-          <ClassCard @cardClick="cardClick" :item="item.courseOfflineEntity"></ClassCard>
+          <ClassCard
+                  @cardClick="cardClick(item.courseOfflineEntity,index,1)"
+                  :item="item.courseOfflineEntity">
+
+          </ClassCard>
         </div >
+        </div>
       </div>
 
 
@@ -45,7 +55,7 @@
           <div v-for="(item,index) in showCourseOnlineList"
           class="item"
           :key="index">
-            <ClassCard @cardClick="cardClick" :item="item"
+            <ClassCard @cardClick="cardClick(item,index,2)" :item="item"
             typeClass="col"></ClassCard>
           </div >
         </div>
@@ -61,7 +71,7 @@
           <div v-for="(item,index) in getNewCourseListList"
           class="item"
           :key="index">
-            <ClassCard @cardClick="cardClick" :item="item"
+            <ClassCard @cardClick="cardClick(item,index,3)" :item="item"
             typeClass="col"></ClassCard>
           </div >
         </div>
@@ -70,18 +80,23 @@
 
       <!-- 优质课程推荐 -->
       <div v-if="getGroomCourseListList.length>0" class="card">
-        <div class="class-title">
-          优质课程推荐
-        </div>
+        <BaseTitle title="优质课程推荐"
+        moreurl=""></BaseTitle>
         <div class="online-box">
           <div v-for="(item,index) in getGroomCourseListList"
           class="item"
           :key="index">
-            <ClassCard @cardClick="cardClick" :item="item"
+            <ClassCard @cardClick="cardClick(item,index,4)" :item="item"
             typeClass="col"></ClassCard>
           </div >
         </div>
       </div>
+
+      <!-- <div class="tips">
+            <span>
+              没有更多了~
+            </span>
+          </div> -->
 
 
     </div>
@@ -131,7 +146,7 @@ export default {
   },
   activated() {
     this.$nextTick(() => {
-      /*eslint-disable*/ 
+      /*eslint-disable*/
       this.$refs.indexScroll && this.$refs.indexScroll.refresh();
       /* eslint-enable */
     });
@@ -162,6 +177,13 @@ export default {
     },
 
     moreclick(moreurl) {
+      if (moreurl === '0') {
+        this.ysxy_columnClick({ LocationName: '线下公开课程查看全部', columnTitle: '' });
+      } else if (moreurl === '1') {
+        this.ysxy_columnClick({ LocationName: '大家都在学查看全部', columnTitle: '' });
+      } else if (moreurl === '2') {
+        this.ysxy_columnClick({ LocationName: '新鲜出炉查看全部', columnTitle: '' });
+      }
       // 查看更多
       let moreData = [{ path: '/open-class' },
         { path: '/online-class', query: { hot: 1 } },
@@ -170,6 +192,7 @@ export default {
       this.routerGo(moreData[moreurl].path, moreData[moreurl].query);
     },
     navclick(item) {
+      this.ysxy_columnClick({ LocationName: item.title, columnTitle: '课程分类' });
       this.routerGo(item.path);
     },
     showFoucusPicFn() {
@@ -177,7 +200,7 @@ export default {
       showFoucusPic({ type: '0' }).then((res) => {
         this.showList.push(true);
         if (res.data.list) {
-          /*eslint-disable*/ 
+          /*eslint-disable*/
           res.data.list.forEach((item)=>{
             item.image = item.pic;
           })
@@ -194,7 +217,7 @@ export default {
       showCourseOffline({ pageSize: 2 }).then((res) => {
         this.showList.push(true);
         if (res.data.list) {
-          /*eslint-disable*/ 
+          /*eslint-disable*/
           res.data.list.forEach((item)=>{
               item.courseOfflineEntity.teacherName = item.teacherName;
               item.courseOfflineEntity.type = item.type;
@@ -212,7 +235,7 @@ export default {
       showCourseOnline({ pageSize: 6 }).then((res) => {
         this.showList.push(true);
         if (res.data.list) {
-          /*eslint-disable*/ 
+          /*eslint-disable*/
           res.data.list.forEach((item)=>{
               item.pic = item.bannerUrl;
           })
@@ -233,7 +256,7 @@ export default {
         this.showList.push(true);
         if (res.data.list) {
           let { list } = res.data;
-          /*eslint-disable*/ 
+          /*eslint-disable*/
           list.forEach((item) => {
               item.pic = item.bannerUrl;
           });
@@ -252,7 +275,7 @@ export default {
         this.showList.push(true);
         let { list } = res.data;
         if (res.data.list) {
-          /*eslint-disable*/ 
+          /*eslint-disable*/
           list.forEach((item) => {
               item.pic = item.bannerUrl;
           });
@@ -270,15 +293,38 @@ export default {
 };
 </script>
 <style scoped>
+ /* .tips{
+    display: block;
+    width: 100%;
+    color: #868686;
+    text-align: center;
+    font-size: 12px;
+    padding: 7px 0 30px 0;
+    height: 20px;
+    line-height: 20px;
+    position: relative;
+  }*/
+  .white{
+    background: #fff;
+    padding: 4px 0;
+  }
   .index{
     position: fixed;
     width: 100%;
     height: 100%;
     top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    left: 50%;
+    transform: translate(-50%,0);
     box-sizing:border-box;
+  }
+  /*no 的属性不会被转为rem*/
+  [data-dpr="0"] .index{
+    max-width: 750px; /*no*/
+  }
+  .viptip{
+    display: block;
+    width: 100%;
+    margin-bottom: 7px;
   }
   .index:after{
     content: "";
@@ -291,8 +337,22 @@ export default {
   }
   .logo{
     display: block;
-    width: 100px;
-    margin: 8px auto;
+    /*width: 28px;*/
+    height: 28px;
+    margin: 4px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo img{
+    width: 28px;
+    height: 100%;
+  }
+  .logo span{
+    font-size: 17px;
+    color: #444444;
+    font-weight: 600;
+    margin-left: 5px;
   }
   .banner-box{
     background: #fff;
@@ -309,21 +369,22 @@ export default {
     position: relative;
     background: #fff;
     width: 100%;
-    /*自动编译为rem 可以写0.5px*/
-    border: 0.5px solid #D4D4D4;
+    /*自动编译为rem 可以写1px*/
+    /* border: 1px solid #D4D4D4; */
     border-radius: 4px;
     top: -5px;
     z-index: 10;
   }
   .card{
     background: #FFFFFF;
-    border: 0.5px solid #D4D4D4;
+    /* border: 1px solid #D4D4D4; */
     border-radius: 4px;
     margin-bottom: 7px;
+    padding-top: 7px;
   }
   .class-title{
     text-align: center;
-    border-bottom: 0.5px solid #D4D4D4;
+    border-bottom: 1px solid #D4D4D4;
     font-size: 12px;
     line-height: 30px;
     font-weight: bold;
@@ -344,6 +405,16 @@ export default {
     margin-bottom: 15px;
   }
   .offline{
-    padding-bottom: 10px;
+    /*padding-bottom: 10px;*/
+  }
+  .pl15{
+    padding: 0 15px;
+  }
+  .offline .item{
+    padding: 15px 0;
+    border-bottom: 1px solid #d8d8d8;
+  }
+  .offline .item:nth-last-child(1){
+    border: none;
   }
 </style>

@@ -1,18 +1,37 @@
 <template>
     <div v-if="isShowPage" class="vipInfo_outer common-openCourses-openCoursesDetails">
+    <template v-if="detailData.effective == 0">
+      <div class="empty">
+        课程已失效
+      </div>
+    </template>
+    <template v-else>
+
+
         <!--banner start-->
         <div class="banner_outer">
+            <!--<baseImg-->
+                    <!--:width="310"-->
+                    <!--:height="200"-->
+                    <!--:src="detailData.pic">-->
+            <!--</baseImg>-->
             <img :src="detailData.pic" alt="">
         </div>
         <!--banner end-->
         <!--title start-->
         <div class="title_outer">
             <div class="tit-left">
-                <span class="title">{{ detailData.title }}</span>
-                <span v-if="detailData.price > 0" class="red">￥{{ detailData.price }}</span>
-                <span v-else class="green">免费</span>
+                <span class="title">
+                     <!-- <span v-show="detailData.payType !== '0'" class="vip_tip">
+                            VIP免费
+                        </span> -->
+                    {{ detailData.title }}
+                </span>
+
             </div>
             <div class="tit-right">
+                <span v-if="detailData.price > 0" class="red">￥{{ detailData.price }}</span>
+                <span v-else class="green">免费</span>
                 <div class="collect_box" @click="collectFn">
                     <i v-if="!isColl" class="icon-dark"></i>
                     <i v-else class="icon-bright"></i>
@@ -26,7 +45,7 @@
         <!--title end-->
         <div class="link"></div>
         <!-- nav start -->
-        <div v-if="detailData" class="nav_outer">
+        <div :class="{fixed:isFixed}" ref="topTab" v-if="detailData" class="nav_outer">
             <ul>
 
                 <li
@@ -44,35 +63,40 @@
         <!-- nav end -->
 
         <!-- 课程信息 start -->
-        <course-info :detailData="detailData" ref="child"></course-info>
+        <course-info :class="{mt44:isFixed}" :detailData="detailData" ref="child"></course-info>
         <!-- 课程信息 end -->
 
         <!--footer start-->
-        <div v-show="detailData.state === '0'" class="footer_outer">
-            <div class="footer-left">
-                <div @click="onlineSignFn">
-                    <i class="icon-user"></i>
-                    <span>报名</span>
-                </div>
-                <div @click="showBtn">
-                    <i class="icon-zixun"></i>
-                    <span>咨询</span>
-                </div>
+
+        <div class="footer_outer">
+            <!--<span @click="goVip">开通会员免费学</span>-->
+            <!--:class="{flex1: detailData.payType === '0'}"-->
+            <div style="width: 80px;">
+                <span @click="qimoChatClickFn"
+                      class="item_consult">
+                    <i class="icon-consult"></i>
+                    咨询
+                </span>
             </div>
-            <div class="footer-right">
-                <span @click="goVip">开通会员免费学</span>
-            </div>
+
+            <span
+                    :class="{'item_member':isQy && detailData.price > 0}"
+                    @click="onlineSignFn"
+                    class="item_course">
+                    报名
+                </span>
+            <span v-show="!isQy && detailData.price > 0" @click="goVip" class="item_member">
+                    会员免费学
+                </span>
         </div>
         <!--footer end-->
-
+      </template>
     </div>
 </template>
 <script>
-// showCourseOffline,
-//     offlineCourseSignUp,
-//     saveMyCollection,
+
 import courseInfo from '@/views/components/courseInfo.vue';
-import { findOfflineCourseById, saveMyCollection } from '@/api/apis';
+import { findOfflineCourseById, saveMyCollection, queryEquity } from '@/api/apis';
 import { getSystem } from '@/assets/utils/util';
 
 
@@ -96,6 +120,9 @@ export default {
         onOffType: '0', // 线上线下0 : 线下课； 1 线上课
       },
       isShowPage: false,
+      oldScrollTop: 0, // 吸顶
+      isFixed: false,
+      isQy: false,
     };
   },
   components: {
@@ -107,10 +134,80 @@ export default {
   mounted() {
     this.init();
   },
-  computed: {
-
+  computed: {},
+  destroyed() {
+    window.removeEventListener('scroll', this.onScroll);
   },
   methods: {
+    init() {
+      this.courseId = parseInt(this.$route.query.cid, 10);
+      // 滚动事件
+      window.addEventListener('scroll', this.onScroll);
+      this.findOfflineCourseByIdFn();
+      if (this.token) {
+        console.log('登录');
+        this.queryEquityFn();
+      }
+    },
+    // 获取详情
+    findOfflineCourseByIdFn() {
+      findOfflineCourseById({ id: this.courseId }).then((res) => {
+        if (res.data.code === '0000' && res.data.data) {
+          this.isShowPage = true;
+          this.isColl = res.data.isFavorite && res.data.isFavorite.code === '8888';
+          this.detailData = res.data.data;
+          this.ysxy_detailView({
+            contentTitle: this.detailData.title,
+            contentId: this.detailData.id,
+            mainTeacher: this.detailData.teacherName,
+            contentSource: this.fromRoute,
+            contentKind: '线下',
+            contentType: this.detailData.price === '0' ? '免费' : '付费',
+            contentPrice: this.detailData.price,
+          });
+          // 自定义分享
+          this.initWxShareFn();
+        }
+      }).catch((err) => {
+        console.log(err);
+      });
+    },
+    // 查询权益
+    queryEquityFn() {
+      queryEquity({ courseType: 1 }).then((res) => {
+        if (res.data.code === '0000') {
+          console.log(res);
+          if (res.data.totalType === undefined || res.data.consumeNum <= 0) {
+            this.isQy = false;
+          } else {
+            this.isQy = true;
+          }
+        }
+      }).catch((err) => {
+        console.log(err);
+        this.$message('获取权益信息失败，请稍后再试');
+      });
+    },
+
+
+    // 滚动事件 吸顶
+    onScroll() {
+      let scrollTop = window.pageYOffset
+                    || document.documentElement.scrollTop
+                    || document.body.scrollTop;
+      let { offsetTop } = this.$refs.topTab;
+      if (offsetTop !== 0) {
+        this.oldScrollTop = offsetTop;
+      }
+      if (scrollTop > this.oldScrollTop) {
+        this.isFixed = true;
+      } else {
+        this.isFixed = false;
+      }
+    },
+    qimoChatClick() {
+      window.qimoChatClick();
+    },
     // 报名
     onlineSignFn() {
       if (this.detailData.state !== '0') {
@@ -123,6 +220,7 @@ export default {
         this.confirmLogin();
         return;
       }
+      window.sessionStorage.setItem('openCourseDetailData', JSON.stringify(this.detailData));
       this.$router.push({ path: `/signup?cid=${this.courseId}` });
     },
     // 收藏
@@ -136,11 +234,19 @@ export default {
         this.wxShareTitle = this.detailData.title;
         // this.wxShareDesc = this.$route.meta.wxShareDesc || '默认描述信息';
         this.wxShareDesc = (document.querySelector('#shareDesc')
-            && document.querySelector('#shareDesc').innerText)
-            || window.location.href;
+                        && document.querySelector('#shareDesc').innerText)
+                        || window.location.href;
         this.wxShareUrl = window.location.href;
         this.wxShareImage = this.detailData.pic;
-        this.wxShareFn();
+        this.wxShareFn(() => {
+          this.ysxy_share({
+            contentTitle: this.detailData.title,
+            contentId: this.detailData.id,
+            contentKind: '线下',
+            contentType: this.detailData.price === '0' ? '免费' : '付费',
+            contentPrice: this.detailData.price,
+          });
+        });
       });
     },
     saveMyCollectionFn() {
@@ -155,10 +261,17 @@ export default {
         if (res.data.code === '0000') {
           if (res.data.type === '0') {
             this.isColl = false;
-            this.$message('已取消收藏');
+            this.$message('已取消收藏!');
           } else {
+            this.ysxy_collect({
+              contentTitle: this.detailData.title,
+              contentId: this.detailData.id,
+              contentKind: '线上',
+              contentType: this.detailData.price === '0' ? '免费' : '付费',
+              contentPrice: this.detailData.price,
+            });
             this.isColl = true;
-            this.$message('已收藏');
+            this.$message('收藏成功!');
           }
         } else {
           this.$message(res.data.message);
@@ -193,12 +306,6 @@ export default {
         },
         onConfirm: () => {
           // 点击确定
-          // let a = document.createElement('a');
-          // let href = 'tel:15114291511';
-          // a.setAttribute('href', href);
-          // document.body.appendChild(a);
-          // a.click();
-          // a.remove();
           this.collPhone();
         },
         onCancel: () => {
@@ -209,21 +316,7 @@ export default {
     collPhone() {
       window.location.href = `tel:${this.COMMON_COMP_DATA.phone}`;
     },
-    init() {
-      this.courseId = parseInt(this.$route.query.cid, 10);
-      // 获取详情
-      findOfflineCourseById({ id: this.courseId }).then((res) => {
-        if (res.data.code === '0000' && res.data.data) {
-          this.isShowPage = true;
-          this.isColl = res.data.isFavorite && res.data.isFavorite.code === '8888';
-          this.detailData = res.data.data;
-          // 自定义分享
-          this.initWxShareFn();
-        }
-      }).catch((err) => {
-        console.log(err);
-      });
-    },
+
     // 点击tabs
     tavsClick(index) {
       this.tabsActive = index;
@@ -233,12 +326,27 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+    .empty{
+      font-size:14px;
+      text-align: center;
+      padding:40px 0;
+    }
     .vipInfo_outer {
         width: 100%;
         height: 100%;
         position: relative;
         div {
             box-sizing: border-box;
+        }
+        .fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin: 0;
+            z-index: 2000;
+        }
+        .mt44 {
+            margin-top: 51px;
         }
         .header_outer {
             width: 100%;
@@ -254,8 +362,8 @@ export default {
         }
         .banner_outer {
             width: 100%;
-            height: 173px;
-            img {
+            height: 200px;
+            img{
                 width: 100%;
                 height: 100%;
             }
@@ -265,6 +373,8 @@ export default {
             min-height: 75px;
             padding: 10px 15px;
             display: flex;
+            background-color: #fff;
+            flex-direction: column;
             justify-content: space-between;
             .tit-left {
                 display: flex;
@@ -272,8 +382,20 @@ export default {
                 justify-content: space-between;
                 overflow: hidden;
                 flex: 1;
-                .title{
+                .title {
                     line-height: 16px;
+                    .vip_tip {
+                        display: inline-block;
+                        width: 60px;
+                        height: 18px;
+                        font-size: 10px;
+                        color: #fff;
+                        text-align: center;
+                        line-height: 20px;
+                        background: #FB683C;
+                        border-radius: 8px;
+                        transform: scale(0.9);
+                    }
                 }
                 span {
                     font-size: 14px;
@@ -285,59 +407,62 @@ export default {
                     word-break: break-all;
                     /*overflow: hidden;*/
                 }
+
+            }
+            .tit-right {
+                /*width: 38px;*/
+                display: flex;
+                /*flex-direction: column;*/
+                align-items: center;
+                justify-content: space-between;
+                .collect_box {
+                    display: flex;
+                    /*flex-direction: column;*/
+                    align-items: center;
+                    /*justify-content: center;*/
+                }
                 .red {
                     color: #F91E1E;
+                    font-size: 17px;
                 }
                 .green {
                     color: #2DAF53;
-                }
-            }
-            .tit-right {
-                width: 38px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                .collect_box{
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
+                    font-size: 17px;
                 }
                 span {
-                    font-size: 11px;
+                    font-size: 12px;
                     color: #868686;
-                    margin-top: 5px;
+                    margin-left: 3px;
                 }
                 i {
                     display: inline-block;
-                    width: 15px;
-                    height: 15px;
+                    width: 17px;
+                    height: 17px;
                 }
                 .icon-dark {
-                    background: url("img/shoucang545454545.png");
+                    background: url("img/shoucang.png");
                     background-size: 100% 100%;
                 }
                 .icon-bright {
-                    background: url("img/shoucang54545.png");
+                    background: url("img/shoucang2.png");
                     background-size: 100% 100%;
                 }
             }
         }
         .nav_outer {
             width: 100%;
-            height: 40px;
+            height: 44px;
             background-color: #fff;
             border-bottom: 1px solid #d4d4d4;
             ul {
                 display: block;
-                overflow:hidden;
+                overflow: hidden;
                 height: 100%;
                 display: flex;
-            align-items: center;
-            justify-content: space-around;
+                align-items: center;
+                justify-content: space-around;
                 li {
-                    box-sizing:border-box;
+                    box-sizing: border-box;
                     height: 100%;
                     text-align: center;
                     line-height: 40px;
@@ -370,60 +495,47 @@ export default {
         }
         .footer_outer {
             width: 100%;
-            height: 48px;
+            height: 50px;
             position: fixed;
             bottom: 0;
             left: 0;
             background-color: #fff;
             display: flex;
-            .footer-left {
-                flex: 1;
-                display: flex;
-                div {
+            border-top: 1px solid #D8D8D8;
+            .item_consult {
+                /*width: 80px;*/
+                display: block;
+                /*line-height: 80px;*/
+                text-align: center;
+                color: #FB683C;
+                font-size: 14px;
+                &.flex1 {
                     flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    span {
-                        font-size: 8.5px;
-                        color: #444;
-                        margin-top: 3px;
-                    }
-                    i {
-                        display: inline-block;
-                        width: 25px;
-                        height: 25px;
-                    }
-                    .icon-user {
-                        background: url("img/fenzu654545454.png");
-                        -webkit-background-size: 100% 100%;
-                        background-size: 100% 100%;
-                    }
-                    .icon-zixun {
-                        background: url("img/zixun165655655.png");
-                        -webkit-background-size: 100% 100%;
-                        background-size: 100% 100%;
-                    }
+                }
+                .icon-consult {
+                    width: 15px;
+                    height: 15px;
+                    display: inline-block;
+                    /*line-height: 50px;*/
+                    position: relative;
+                    top: 3px;
+                    background: url("img/zixun2.png") no-repeat;
+                    -webkit-background-size: 100%;
+                    background-size: 100%;
                 }
             }
-            .footer-right {
+            .item_course {
+                background: #FF825E;
+            }
+            .item_member {
+                background: #FB683C;
+            }
+            span {
                 flex: 1;
-
-                span {
-                    width: 100%;
-                    height: 100%;
-                    text-align: center;
-                    line-height: 48px;
-                    background-color: #FB683C;
-                    display: block;
-                    font-size: 17px;
-                    color: #fff;
-                    font-weight: 600;
-                    &:active{
-                        background-color: #d85a34;
-                    }
-                }
+                color: #fff;
+                font-size: 18px;
+                text-align: center;
+                line-height: 50px;
             }
         }
         .link {

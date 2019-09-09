@@ -1,24 +1,17 @@
 <template>
   <div v-if="isShowPage" class="allclass common-allclass-index">
+      <basenav curindex="1" :list="navlist"></basenav>
+            <!-- 公开课 -->
+             <div v-if="list.length<1 && isShowPage" class="emptybg">
+            <div class="empty" >
+              <span class="icon-empty"></span>
+              <template>
+                <p @click="routerReplace('/online-class')">暂无线上公开课~ <br>
+                  <span class="active">先去学习一下线上课吧！</span></p>
+              </template>
+            </div>
+            </div>
 
-    <!-- 顶部导航 -->
-    <div class="nav">
-      <div v-for="(item,index) in navlist"
-      class="item"
-      @click="routerReplace(item.path)"
-      :class="{active:item.type == '2'}"
-      :key="index">
-        <span>{{item.text}}</span>
-      </div>
-    </div>
-      <!-- 公开课 -->
-      <div class="empty" v-if="list.length<1 && isShowPage">
-        <span class="icon-empty"></span>
-        <template>
-          <p @click="routerReplace('/online-class')">暂无线上公开课~ <br>
-            <span class="active">先去学习一下线上课程吧！</span></p>
-        </template>
-      </div>
       <div v-if="list.length>0" class="view-wrapper">
         <cube-scroll
             ref="scroll"
@@ -29,6 +22,8 @@
             @pulling-up="onPullingUp">
           <!-- 上拉加载 -->
           <!-- 展示区域 -->
+          <!-- 顶部导航 -->
+
           <div class="list">
           <div v-for="(item,index) in list" class="item"
           :key="index">
@@ -37,13 +32,15 @@
           </div >
 
           </div>
-          <div class="h80"></div>
+          <div v-if="list.length>14" class="h80"></div>
           <template slot="pullup" slot-scope="props">
           <div v-if="props.isPullUpLoad" class="tips">
             加载中...
           </div>
           <div v-else class="tips">
-            已经到底了~
+            <span v-show="list.length>14">
+              没有更多了~
+            </span>
           </div>
           </template>
         </cube-scroll>
@@ -59,25 +56,31 @@ import {
   offlineCourseList,
 } from '@/api/apis';
 import ClassCard from '@/views/components/card.vue';
+import basenav from '@/views/components/nav.vue';
 
 export default {
   name: 'allclass',
+  components: {
+    ClassCard,
+    basenav,
+  },
   data() {
     return {
-      tips: '已经到底了~',
+      tips: '没有更多了~',
       infinite: true,
       type: '2', // 1线上课 2线下公开课
       offset: 200,
       navlist: [
         {
-          text: '线下公开课',
-          type: '2',
-          path: '/open-class',
-        },
-        {
-          text: '线上录播课',
+          text: '线上课',
           type: '1',
           path: '/online-class',
+        },
+        {
+          text: '线下课',
+          type: '2',
+          path: '/open-class',
+          active: true,
         },
       ],
       list: [], // 课程列表  公开课 线上课共用
@@ -88,14 +91,12 @@ export default {
       pullUpLoad: true,
       pullUpLoadThreshold: 100,
       pullUpLoadMoreTxt: '上拉加载',
-      pullUpLoadNoMoreTxt: '已经到底了~',
+      pullUpLoadNoMoreTxt: '没有更多了~',
       customPullDown: false,
       isShowBackTop: false, // 返回顶部
     };
   },
-  components: {
-    ClassCard,
-  },
+
   computed: {
     options() {
       return {
@@ -159,6 +160,7 @@ export default {
           /*eslint-disable*/ 
               res.data.list.forEach((item)=>{
                 item.type='2';
+                item.learner = item.signUpManNum;
               })
           if(t==='init'){
             this.list = res.data.list;
@@ -192,8 +194,15 @@ export default {
   }
 </style>
 <style scoped>
+.emptybg{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 47px;
+}
 .h80{
-  height: 80px;
+  height: 57px;
   display: block;
   position: relative;
   overflow: hidden;
@@ -204,55 +213,22 @@ export default {
   color: #868686;
   text-align: center;
   font-size: 12px;
-  padding: 30px 0;
+  padding: 7px 0 30px 0;
   height: 20px;
   line-height: 20px;
   position: absolute;
   bottom: 0;
 }
   .allclass{
-    padding-bottom: 50px;
     position: absolute;
     width: 100%;
-    height: 100%;
     top: 0;
+    bottom: 50px;
     left: 0;
+    right: 0;
     box-sizing:border-box;
   }
-  .nav{
-    display: flex;
-    width: 100%;
-    height: 40px;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 7px solid #f1f1f1;
-  }
-  .nav .item{
-    width: 50%;
-    text-align: center;
-    font-size: 0;
-  }
-  .nav .item span{
-    font-size: 14px;
-    display: inline-block;
-    height: 40px;
-    line-height: 40px;
-    position: relative;
-  }
-  .nav .active span{
-    color: #FB683C;
-  }
-  .nav .active span:after{
-    content: "";
-    position: absolute;
-    display: block;
-    width: 100%;
-    height: 3px;
-    background: #FB683C;
-    border-radius: 100px;
-    bottom: 0;
-    left: 0;
-  }
+
   .empty{
     padding-top: 103px;
     font-size: 17px;
@@ -273,16 +249,17 @@ export default {
     margin-top: 15px;
   }
   .list{
-    border-bottom: 0.5px solid #d4d4d4;
+    border-bottom: 1px solid #d4d4d4;
     padding-left: 15px;
     display: block;
     width: 100%;
     box-sizing:border-box;
+    background: #fff;
   }
   .list .item{
     width: 100%;
     padding: 15px 15px 15px 0;
-    border-bottom: 0.5px solid #d4d4d4;
+    border-bottom: 1px solid #d4d4d4;
     box-sizing:border-box;
   }
   .list .item:nth-last-child(1){
@@ -293,6 +270,7 @@ export default {
     top: 47px;
     bottom: 50px;
     width: 100%;
+    box-sizing:border-box;
   }
   .list-box{
     display: block;
